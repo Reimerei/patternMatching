@@ -1,4 +1,12 @@
+/**
+ * -1 < color < 5
+ * -1 < shape < 5
+ * -1 < pattern < 5
+ * -1 < count < 5
+ * selected is a bool
+ **/
 function buildCardSvg(cssClass, color, shape, pattern, count, selected){
+  // the params color, shape, pattern, count are indices in arrays
 
   var W = 170,
       PW = W * 0.05,
@@ -61,7 +69,7 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
 
   ];
 
-  var colors = ['red', 'green', 'blue', 'black'];
+  var colors = ['red', 'green', 'blue', 'black', 'yellow'];
 
   var positions = [
     //0
@@ -71,7 +79,9 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
     //2
     [[W/2.0, W*r2],[W*r3,W*(1-r3)],[W*(1-r3), W*(1-r3)]],
     //3
-    [[W*r3, W*r2], [W*(1-r3), W*r2],[W*r3,W*(1-r3)],[W*(1-r3), W*(1-r3)]]
+    [[W*r3, W*r2], [W*(1-r3), W*r2],[W*r3,W*(1-r3)],[W*(1-r3), W*(1-r3)]],
+    //4
+    [[W*r3, W*r2], [W*(1-r3), W*r2],[W*r3,W*(1-r3)],[W*(1-r3), W*(1-r3)], [W/2.0, W/2.0]]
   ];
 
 
@@ -100,12 +110,22 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
             .pattern(0,0,width,width);
         el.attr({fill: pattern});
     },
+    //crossing diagonal lines
+    function(el){
+        var width=PW*0.9 /el.scaledBy;
+        var wh = width/2.0;
+        var pattern = s.path("M 0 "+wh+" L "+wh+" 0 M "+wh+" "+width+" L "+width+" "+wh+
+                             "M 0 "+wh+" L "+wh+" "+width+" M "+wh+" 0 L "+width+" "+wh)
+            .attr({strokeWidth: width/4, stroke: colors[color], strokeLinecap: 'square'})
+            .pattern(0,0,width,width);
+        el.attr({fill: pattern});
+    },
     //diagonal lines
     function(el){
         var width=PW*0.6 /el.scaledBy;
         var wh = width/2.0;
         var pattern = s.path("M 0 "+wh+" L "+wh+" 0 M "+wh+" "+width+" L "+width+" "+wh)
-            .attr({strokeWidth: Math.sqrt(2*wh), stroke: colors[color], strokeLinecap: 'square'})
+            .attr({strokeWidth: width/4, stroke: colors[color], strokeLinecap: 'square'})
             .pattern(0,0,width,width);
         el.attr({fill: pattern});
     },
