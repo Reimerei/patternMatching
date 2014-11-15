@@ -116,7 +116,8 @@ object Dependencies {
     "org.webjars" % "codemirror" % "4.3",
     "org.webjars" % "bootstrap" % "3.2.0",
     "org.webjars" % "font-awesome" % "4.1.0",
-    "org.scalajs" %% "scalajs-pickling-play-json" % "0.3.1"
+    "org.scalajs" %% "scalajs-pickling-play-json" % "0.3.1",
+    "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.4"
   ) )
 
   val scalajs = Def.setting(shared.value ++ Seq(

@@ -85,6 +85,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
         if (!Game.hasMoreSets(activeCards(deck))) {
+          context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
           self ! PoisonPill
         }
@@ -94,7 +95,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       }
 
     case UserQuit =>
-      players.find(_ == sender).map {
+      players.find(_._1 == sender).map {
         player =>
           players = players.updated(sender, players(sender).copy(connected = false))
           if (players.values.forall(!_.connected)) {
