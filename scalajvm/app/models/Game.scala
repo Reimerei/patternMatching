@@ -95,7 +95,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       }
 
     case UserQuit =>
-      players.find(_ == sender).map {
+      players.find(_._1 == sender).map {
         player =>
           players = players.updated(sender, players(sender).copy(connected = false))
           if (players.values.forall(!_.connected)) {
