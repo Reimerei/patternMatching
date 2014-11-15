@@ -1,12 +1,12 @@
-package example
+package game
 
 import org.scalajs.spickling._
 import shared._
 
 import scala.collection.immutable.HashMap.HashTrieMap
 import scala.collection.immutable.HashSet.HashTrieSet
-import scala.collection.immutable.Map.{ Map1, Map2, Map3, Map4 }
-import scala.collection.immutable.Set.{ Set1, Set2, Set3, Set4 }
+import scala.collection.immutable.Map.{Map1, Map2, Map3, Map4}
+import scala.collection.immutable.Set.{Set1, Set2, Set3, Set4}
 
 /**
  * Support for pickling maps and sets. See https://github.com/jlc/scala-js-pickling/commit/9d97943eb323925108eb236fd383972bca2bd397

@@ -1,4 +1,11 @@
-package example
+package game
+
+
+/**
+ * User: Björn Reimer
+ * Date: 15.11.14
+ * Time: 20:40
+ */
 
 import org.scalajs.dom
 import org.scalajs.jquery.{ jQuery => $, JQueryEventObject, JQueryStatic }
@@ -10,7 +17,6 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{ global => g }
 import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExport
-import scalatags.JsDom._
 import scalatags.JsDom.all._
 
 import Pickles._
@@ -24,6 +30,7 @@ object SetJS {
 
   @JSExport
   def main(wsUrl: String) = {
+    Pickles.register()
     val setClient = new SetClient(wsUrl)
   }
 
@@ -39,7 +46,6 @@ object SetJS {
 
     var selectedCards: Seq[Int] = Seq()
 
-    Pickles.register()
 
     val socket = new dom.WebSocket(url)
     socket.onmessage = receive _
@@ -190,4 +196,5 @@ object SetJS {
 
   }
 }
+
 
