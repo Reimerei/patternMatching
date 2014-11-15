@@ -1,7 +1,7 @@
 package example
 
 import org.scalajs.dom
-import org.scalajs.jquery.{jQuery => $, JQueryStatic}
+import org.scalajs.jquery.{ jQuery => $, JQueryStatic }
 import org.scalajs.spickling.PicklerRegistry
 import org.scalajs.spickling.jsany._
 import shared._
@@ -49,7 +49,7 @@ object SetJS {
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
           content.appendChild(WebElements.displayGame(cards).render)
-          content.appendChild(div(id := scoreCardId){}.render)
+          content.appendChild(div(id := scoreCardId) {}.render)
           updateScoreCard(scoreCard)
         case SetCompleted(completedSet, newCards, scoreCard) =>
           updateBoard(completedSet, newCards)
@@ -72,7 +72,7 @@ object SetJS {
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
-    def updateBoard(completedSet : Set[Card], newCards: Set[Card]) = {
+    def updateBoard(completedSet: Set[Card], newCards: Set[Card]) = {
       //TODO
     }
 
@@ -86,38 +86,36 @@ object SetJS {
       val t = table(tbody(List(headers) ++ data))
       scorecard.innerHTML = t.render.outerHTML
     }
-  }
 
-  object WebElements {
+    object WebElements {
 
-    def enterName(client: SetClient) = div(id := "signInPanel") {
-      form(`class` := "form-inline", "role".attr := "form")(
-        div(id := "usernameForm", `class` := "form-group")(
-          div(`class` := "input-group")(
-            div(`class` := "input-group-addon", raw("&#9786;")),
-            input(id := "username", `class` := "form-control", `type` := "text", placeholder := "Enter username")
-          )
-        ),
-        span(style := "margin:0px 5px"),
-        button(`class` := "btn btn-default", onclick := { () =>
-          val input = $("#username").value().toString.trim
-          if (input == "") {
-            $("#usernameForm").addClass("has-error")
-            dom.alert("Invalid username")
-          } else {
-             client.joinGame(input)
-          }
-          false
-        })("Sign in")
-      )
-    }
+      def enterName() = div(id := "signInPanel") {
+        form(`class` := "form-inline", "role".attr := "form")(
+          div(id := "usernameForm", `class` := "form-group")(
+            div(`class` := "input-group")(
+              div(`class` := "input-group-addon", raw("&#9786;")),
+              input(id := "username", `class` := "form-control", `type` := "text", placeholder := "Enter username")
+            )
+          ),
+          span(style := "margin:0px 5px"),
+          button(`class` := "btn btn-default", onclick := { () =>
+            val input = $("#username").value().toString.trim
+            if (input == "") {
+              $("#usernameForm").addClass("has-error")
+              dom.alert("Invalid username")
+            } else {
+              joinGame(input)
+            }
+            false
+          })("Sign in")
+        )
+      }
 
       def waitingForGame = div() {
         "Waiting For Game..."
       }
 
       def singleCard(card: Card) = div(`class` := "card", onclick := { () =>
-
 
         if ($("this").hasClass("select")) {
           $("this").removeClass("select")
@@ -126,16 +124,23 @@ object SetJS {
         }
 
         if ($(".select").length == 3) {
-         println($(".select").attr("value"))
+          println($(".select").attr("value"))
           // todo send to backend
 
           $(".select").removeClass("select")
+        }
+      }
+    ) {
+//      card.id.mkString(", ")
+        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
+
     }
 
-    def displayGame(cards: Set[Card])  = div(`class` := "board"){
+      def displayGame(cards: Set[Card]) = div(`class` := "board") {
         cards.toSeq.map(singleCard)
       }
     }
+
   }
 }
 
