@@ -57,7 +57,7 @@ object ApplicationBuild extends Build with UniversalKeys {
 
   lazy val scalajsSettings =
     scalaJSSettings ++ Seq(
-      name := "scalajs-example",
+      name := "scalajs-set",
       version := Versions.app,
       scalaVersion := Versions.scala,
       persistLauncher := true,
