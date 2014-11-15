@@ -46,10 +46,6 @@ class UserActor(out : ActorRef) extends Actor {
         case _ => Logger.warn(s"Unknown message $msg")
       }
 
-      //temporary
-      val test = WrongGuess
-      self ! test
-
       Logger.debug(s"Received message: $msg")
 
     case msg: ServerSend =>
