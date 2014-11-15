@@ -13,6 +13,7 @@ import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom._
 import scalatags.JsDom.all._
 
+import Pickles._
 
 @JSExport
 object SetJS {
@@ -25,10 +26,7 @@ object SetJS {
 
   class SetClient(url: String) {
 
-    PicklerRegistry.register[CreateGame]
-    PicklerRegistry.register[JoinGameWithoutId]
-    PicklerRegistry.register[JoinGameWithId]
-    PicklerRegistry.register[GameStart]
+    Pickles.register()
 
     val socket = new dom.WebSocket(url)
     socket.onmessage = receive _
@@ -41,10 +39,16 @@ object SetJS {
 
     def receive(e: dom.MessageEvent) = {
       println("received: " + e.data.toString)
-//      val json = js.JSON.parse(e.data.toString)
-      PicklerRegistry.unpickle(e.data) match {
+      val json = js.JSON.parse(e.data.toString).asInstanceOf[js.Any]
+      PicklerRegistry.unpickle(json) match {
         case GameStart(cards, scoreCard, gameId) =>
-          println("game start!")
+          val content = dom.document.getElementById("content")
+          content.innerHTML = ""
+          content.appendChild(WebElements.displayGame(cards).render)
+          updateScoreCard(scoreCard)
+        case SetCompleted(newCards, scoreCard) =>
+          updateBoard(newCards)
+          updateScoreCard(scoreCard)
         case x => println("unknown message: " + println(x))
       }
     }
@@ -62,6 +66,15 @@ object SetJS {
       val cards = Set(Card(List(1,2,3,4)))
       content.appendChild(WebElements.displayGame(cards).render)
     }
+
+    def updateBoard(newCards : Set[Card]) = {
+      //TODO
+    }
+
+    def updateScoreCard(scoreCard : Map[Player, Int]) = {
+      //TODO
+    }
+
   }
 
   object WebElements {
@@ -92,8 +105,9 @@ object SetJS {
       "Waiting For Game..."
     }
 
-    def singleCard(card: Card) = div(`class` := "card"){
+    def singleCard(card: Card) = div(`class` := "card" ){
        card.id.mkString(", ")
+
     }
 
     def displayGame(cards: Set[Card])  = div(`class` := "board"){
@@ -101,6 +115,8 @@ object SetJS {
     }
 
   }
+
+
 
 }
 
