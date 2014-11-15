@@ -59,7 +59,7 @@ class UserActor(out : ActorRef) extends Actor {
       currentGame = Some(sender())
       pickleAndSend(msg, out)
 
-    case msg : Any =>
+    case msg : ServerSend =>
       pickleAndSend(msg, out)
   }
 
