@@ -1,6 +1,6 @@
 package models
 
-import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.actor._
 import akka.event.LoggingReceive
 import akka.persistence.PersistentActor
 import play.api.Play.current
@@ -35,11 +35,15 @@ private class GameMaster extends PersistentActor with ActorLogging {
       sender ! GameCreated(gameId)
 
     case msg: GameStart =>
-      log.debug(s"$msg")
+      log.debug(s"Game started")
       pendingGames = pendingGames.filterNot(_ == sender)
 
     case msg @ GameFinished(score) => 
       persist(msg)(x => updateRating(score))
+
+    case Terminated(child) =>
+      log.debug("Game terminated")
+      pendingGames = pendingGames.filterNot(_ == child)
   }
 
 
