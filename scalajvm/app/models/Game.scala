@@ -51,7 +51,7 @@ object Game {
 
 class Game(gameId: Long) extends Actor with ActorLogging {
 
-  val BOARD_SIZE: Int = 12
+  val BOARD_SIZE: Int = 16
   val SET_SIZE: Int = 3
 
   var players: Map[ActorRef, PlayerState] = Map()
@@ -103,7 +103,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
         publish(SetCompleted(set, newCards, scoreCard))
 
-        if (!Game.hasMoreSets(activeCards(deck))) {
+        if (!Game.hasMoreSets(activeCards(deckUpdated))) {
           context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
           self ! PoisonPill
