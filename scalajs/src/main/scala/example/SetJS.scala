@@ -92,7 +92,11 @@ object SetJS {
       "Waiting For Game..."
     }
 
-//    def renderGame(cards)
+    def singleCard(card: Card) = {
+
+    }
+
+//    def renderGame(cards: Set[Card])
 
 
   }

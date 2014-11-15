@@ -1,6 +1,7 @@
 package models
 
-import akka.actor.{PoisonPill, Props, ActorRef, Actor}
+import akka.actor._
+import akka.event.LoggingReceive
 import shared._
 
 import scala.util.Random
@@ -48,7 +49,7 @@ object Game {
   }
 }
 
-class Game(gameId: Long) extends Actor {
+class Game(gameId: Long) extends Actor with ActorLogging {
 
   val BOARD_SIZE: Int = 12
   val SET_SIZE: Int = 3
@@ -58,19 +59,24 @@ class Game(gameId: Long) extends Actor {
 
   override def receive: Receive = pending
 
-  def pending: Receive = {
-    case JoinGameWithId(name, _) =>
+  def pending: Receive = LoggingReceive {
+    case msg @ JoinGameWithoutId(name) =>
+      log.debug(s"$msg")
       players += sender() -> (name, 0)
-      if (players.size == 2){
+      if (players.keys.size >= 2){
         val deck: Seq[Card] = Game.createDeck
         context.become(active(deck))
         val state: GameStart = GameStart(activeCards(deck), scoreCard, gameId)
         context.parent ! state
         publish(state)
+        log.debug(s"Start new game: $state")
       }
+      
+    case msg =>
+      log.debug(s"Unhandled message: $msg")
   }
 
-  def active(deck: Seq[Card]): Receive = {
+  def active(deck: Seq[Card]): Receive = LoggingReceive {
     case Guess(set) =>
       if (Game.validate(set.toSeq, activeCards(deck))) {
         updateScore(sender)
