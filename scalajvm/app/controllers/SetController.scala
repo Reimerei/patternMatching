@@ -3,6 +3,8 @@ package controllers
 import play.api.libs.json.JsValue
 import play.api.mvc.{WebSocket, Action, Controller}
 import models.UserActor
+import play.api.Play.current
+
 
 /**
  * User: Björn Reimer
