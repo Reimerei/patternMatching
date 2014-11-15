@@ -20,12 +20,17 @@ class GameSpec extends Specification {
 
   "Game" should {
 
+    "validate accepts valid set" in {
+      val cards = Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))
+      Game.validate(cards, cards.take(cards.length).toSet) must beTrue
+    }
+
     "validateEqualityRule accepts valid set" in {
       Game.validateEqualityRule(Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))) must beTrue
     }
 
     "validateEqualityRule rejects invalid set" in {
-      Game.validateEqualityRule(Seq(Card(Seq(1,1,1)), Card(Seq(1,1,1)), Card(Seq(5,1,1)))) must beFalse
+      Game.validateEqualityRule(Seq(Card(Seq(1, 1, 1)), Card(Seq(1, 1, 1)), Card(Seq(5, 1, 1)))) must beFalse
     }
   }
 }

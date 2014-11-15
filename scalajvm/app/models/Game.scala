@@ -1,12 +1,23 @@
 package models
 
-import akka.actor.{Props, ActorRef, Actor}
+import akka.actor.{PoisonPill, Props, ActorRef, Actor}
 import shared._
 
 import scala.util.Random
 
 object Game {
   def props(gameId: Long): Props = Props(new Game(gameId))
+
+
+  def createDeck: Seq[Card] = {
+    val deck = for {
+      color <- 0 to 2
+      shape <- 0 to 2
+      fill <- 0 to 2
+      count <- 0 to 2
+    } yield Card(Seq(color, shape, fill, count))
+    Random.shuffle(deck)
+  }
 
   def validateBits: Seq[Int] => Boolean =
     s => {
@@ -46,7 +57,7 @@ class Game(gameId: Long) extends Actor {
     case JoinGame(name, _) =>
       players += sender() -> (name, 0)
       if (players.size == 2){
-        val deck: Seq[Card] = createDeck
+        val deck: Seq[Card] = Game.createDeck
         context.become(active(deck))
         val state: GameStart = GameStart(activeCards(deck), scoreCard, gameId)
         context.parent ! state
@@ -60,8 +71,10 @@ class Game(gameId: Long) extends Actor {
         updateScore(sender)
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
-        if (!Game.hasMoreSets(activeCards(deck)))
+        if (!Game.hasMoreSets(activeCards(deck))){
           publish(GameFinished(scoreCard))
+          self ! PoisonPill
+        }
       }
       else {
         sender ! WrongGuess
@@ -71,18 +84,8 @@ class Game(gameId: Long) extends Actor {
   def updateScore(player: ActorRef): Unit =
     players = players.updated(player, players(player).copy(_2 = players(player)._2 + 1))
 
-  def createDeck: Seq[Card] = {
-    val deck = for {
-      color <- 0 to 2
-      shape <- 0 to 2
-      fill <- 0 to 2
-      count <- 0 to 2
-    } yield Card(Seq(color, shape, fill, count))
-    Random.shuffle(deck)
-  }
 
   def scoreCard: Map[Player, Int] = players.values.map(p => Player(p._1) -> p._2).toMap
-
 
   def publish(msg: Any): Unit = players.keys.foreach(_ ! msg)
 
