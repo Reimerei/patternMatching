@@ -1,7 +1,7 @@
 package example
 
 import org.scalajs.dom
-import org.scalajs.jquery.{ jQuery => $, JQueryStatic }
+import org.scalajs.jquery.{jQuery => $, JQueryEventObject, JQueryStatic}
 import org.scalajs.spickling.PicklerRegistry
 import org.scalajs.spickling.jsany._
 import shared._
@@ -16,7 +16,7 @@ import scalatags.JsDom.all._
 import Pickles._
 
 object StdGlobalScope extends js.GlobalScope {
-  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): JQueryStatic = ???
+  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): Any = ???
 }
 
 @JSExport
@@ -34,6 +34,8 @@ object SetJS {
 
     private var cardsInPlay : List[Card] = Nil
     private var scoreCard = Map[Player, Int]()
+
+    var selectedCards: Seq[Int] = Seq()
 
     Pickles.register()
 
@@ -82,8 +84,6 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = List(Card(List(1, 2, 3, 4)))
-      content.appendChild(WebElements.displayGame(cards).render)
     }
 
     def gameFinished() = {
@@ -98,6 +98,19 @@ object SetJS {
       val board = dom.document.getElementById(boardId)
       board.innerHTML = WebElements.displayGame(cardsInPlay).render.outerHTML
       updateScoreCard()
+    }
+
+    def cardSelected(index: Int) = {
+      if(selectedCards.contains(index)) {
+        selectedCards = selectedCards.filterNot(_.equals(index))
+      } else {
+        selectedCards +:= index
+        if(selectedCards.length == 3) {
+//          send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._1))))
+          println("send guess!")
+        }
+      }
+      println("selected cards: " + selectedCards)
     }
 
     def updateScoreCard() = {
@@ -133,22 +146,9 @@ object SetJS {
         "Waiting For Game..."
       }
 
-      def singleCard(card: Card) = div(`class` := "card", onclick := { () =>
-
-        if ($("this").hasClass("select")) {
-          $("this").removeClass("select")
-        } else {
-          $("this").addClass("select")
-        }
-
-        if ($(".select").length == 3) {
-          println($(".select").attr("value"))
-          // todo send to backend
-
-          $(".select").removeClass("select")
-        }
-      }
-    ) {
+      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index, value := index, onclick := { () =>
+        cardSelected(index)
+      }) {
       card.id.mkString(", ")
 //        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
@@ -158,7 +158,7 @@ object SetJS {
 
 
       def displayGame(cards: List[Card]) = div(`class` := "board") {
-        cards.map(singleCard)
+        cards.zipWithIndex.map{case(i, card) => singleCard(i, card)}
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
