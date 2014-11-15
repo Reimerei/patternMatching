@@ -58,7 +58,6 @@ object SetJS {
           content.appendChild(div(id := scoreCardId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
-          val zipped = completedSet.zip(newCards)
           //TODO: optimize to only map over cardsInPlay once
           completedSet.zip(newCards).foreach{
             case (oldCard, newCard) => cardsInPlay = cardsInPlay.map{c => if(c == oldCard) newCard else oldCard}
@@ -79,7 +78,7 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = Set(Card(List(1, 2, 3, 4)))
+      val cards = List(Card(List(1, 2, 3, 4)))
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
@@ -146,8 +145,8 @@ object SetJS {
       def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
 
-      def displayGame(cards: Set[Card]) = div(`class` := "board") {
-        cards.toSeq.map(singleCard)
+      def displayGame(cards: List[Card]) = div(`class` := "board") {
+        cards.map(singleCard)
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
