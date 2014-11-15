@@ -16,6 +16,7 @@ object ChatJS {
   val maxMessages = 20
 
   var assetsDir: String = ""
+
   var wsBaseUrl: String = ""
 
   var client: Option[ChatClient] = None

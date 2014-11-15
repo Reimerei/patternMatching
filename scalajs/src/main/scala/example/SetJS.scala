@@ -3,7 +3,7 @@ package example
 import config.Routes
 import org.scalajs.dom.extensions.Ajax
 import org.scalajs.spickling.PicklerRegistry
-import shared.{JoinGame, ClientSends}
+import shared.{CreateGame, JoinGame, ClientSends}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import js.Dynamic.{ global => g }
@@ -11,38 +11,39 @@ import org.scalajs.dom
 import scalatags.JsDom._
 import all._
 import org.scalajs.jquery.{jQuery=>$}
+import org.scalajs.spickling.jsany._
+
 
 @JSExport
 object SetJS {
 
   @JSExport
-  def main(settings: js.Dynamic) = {
-
-//    new WSConnection()
-
+  def main(wsUrl: String) = {
+    val connection = new WSConnection(wsUrl)
+    connection.send(CreateGame("foo"))
   }
 
+  class WSConnection(url: String) {
+
+    PicklerRegistry.register[CreateGame]
+
+    val socket = new dom.WebSocket(url)
+//    socket.onmessage = receive _
+
+    def send(message: ClientSends) = {
+      val json = PicklerRegistry.pickle(message)
+      println("sending: " + json)
+      socket.send(json)
+    }
+
+    def receive(e: dom.MessageEvent) = {
+      val json = js.JSON.parse(e.data.toString)
+      println(json)
+    }
 
 
+  }
 
 
 }
 
-class WSConnection(url: String) {
-
-  PicklerRegistry.register[JoinGame]
-
-  val socket = new dom.WebSocket(url)
-  socket.onmessage = receive _
-
-  def send(message: ClientSends) = {
-//    socket.send(PicklerRegistry.pickle(message))
-  }
-
-  def receive(e: dom.MessageEvent) = {
-    val json = js.JSON.parse(e.data.toString)
-    println(json)
-  }
-
-
-}
