@@ -30,9 +30,7 @@ private class GameMaster extends PersistentActor with ActorLogging {
       context.children.find(_.path.name == s"game-$gameId").map(game => game forward msg).getOrElse(sender ! GameNotFound)
 
     case CreateGame(player) =>
-      val gameId = nextId
-      context.actorOf(Game.props(gameId), name = s"game-$gameId")
-      sender ! GameCreated(gameId)
+      sender ! GameCreated(createGame())
 
     case msg: GameStart =>
       log.debug(s"Game started")
@@ -41,18 +39,25 @@ private class GameMaster extends PersistentActor with ActorLogging {
     case msg @ GameFinished(score) => 
       persist(msg)(x => updateRating(score))
 
+    case msg @ UserQuit =>
+      pendingGames.foreach(_ forward msg)
+
     case Terminated(child) =>
       log.debug("Game terminated")
       pendingGames = pendingGames.filterNot(_ == child)
   }
 
+  def createGame(): Long = {
+    val gameId = nextId
+    val game: ActorRef = context.actorOf(Game.props(gameId), name = s"game-$gameId")
+    pendingGames += game
+    context.watch(game)
+    gameId
+  }
 
   def findOrCreateGame(): ActorRef = {
-    if (pendingGames.isEmpty) {
-      val gameId = nextId
-      val game: ActorRef = context.actorOf(Game.props(gameId), name = s"game-$gameId")
-      pendingGames += game
-    }
+    if (pendingGames.isEmpty)
+      createGame()
     pendingGames.head
   }
 

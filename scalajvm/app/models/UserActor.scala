@@ -57,5 +57,6 @@ class UserActor(out : ActorRef) extends Actor {
 
   override def postStop() : Unit = {
     currentGame.foreach( _ ! UserQuit)
+    GameMaster.gameMaster ! UserQuit
   }
 }
