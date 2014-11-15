@@ -52,6 +52,7 @@ object SetJS {
 
     def receive(e: dom.MessageEvent) = {
       val json = js.JSON.parse(e.data.toString).asInstanceOf[js.Any]
+
       PicklerRegistry.unpickle(json) match {
         case GameStart(cards, updatedScoreCard, gameId) =>
           cardsInPlay = cards.toList
@@ -102,17 +103,18 @@ object SetJS {
     }
 
     def wrongGuess() = {
-      //TODO
+      selectedCards = Seq()
+      render()
     }
 
-    def render() = {
+    def render(): Any = {
       val board = dom.document.getElementById(boardId)
       board.innerHTML = ""
       board.appendChild(WebElements.displayGame(cardsInPlay).render)
       updateScoreCard()
       cardsInPlay.zipWithIndex.foreach{
-        case (card, i) =>
-          StdGlobalScope.buildCardSvg("c_" + i, card.id(0), card.id(1), card.id(2), card.id(3), false)
+        case (card, j) =>
+          StdGlobalScope.buildCardSvg("c_" + j, card.id(0), card.id(1), card.id(2), card.id(3), selectedCards.contains(j))
       }
     }
 
@@ -124,10 +126,9 @@ object SetJS {
         if (selectedCards.length == 3) {
           send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._2)).map(_._1).toSet))
           println("send guess!")
-          selectedCards = Seq()
         }
       }
-      println("selected cards: " + selectedCards)
+      render()
     }
 
     def updateScoreCard() = {
@@ -163,7 +164,7 @@ object SetJS {
         "Waiting For Game..."
       }
 
-      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index + " col-xs-4", onclick := { () =>
+      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index + " col-xs-3", onclick := { () =>
         println("clicked")
         cardSelected(index)
       }) { }
