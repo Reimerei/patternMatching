@@ -66,12 +66,14 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       players += sender() -> PlayerState(name, 0, true)
 
       if (players.keys.size >= 2) {
+
         val deck: Seq[Card] = Game.createDeck
-        context.become(active(deck))
-        val state: GameStart = GameStart(activeCards(deck), scoreCard, gameId)
+        val state: GameStart = GameStart(deck.take(BOARD_SIZE).toSet, scoreCard, gameId)
+
         context.parent ! state
         publish(state)
-        //        log.debug(s"Start new game: $state")
+
+        context.become(active(deck))
       }
 
     case UserQuit =>
@@ -92,9 +94,12 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
     case Guess(set) =>
       if (Game.validate(set.toSeq, activeCards(deck))) {
+
         updateScore(sender)
+
         val deckUpdated: Seq[Card] = deck.diff(set.toSeq)
-        val newCards : Set[Card] = deckUpdated.take(SET_SIZE).toSet
+
+        val newCards : Set[Card] = deckUpdated.drop(BOARD_SIZE - SET_SIZE).take(SET_SIZE).toSet
 
         publish(SetCompleted(set, newCards, scoreCard))
 
