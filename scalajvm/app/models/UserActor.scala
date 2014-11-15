@@ -13,7 +13,8 @@ object UserActor {
   PicklerRegistry.register(WrongGuess)
   PicklerRegistry.register[GameFinished]
   PicklerRegistry.register[Guess]
-  PicklerRegistry.register[JoinGame]
+  PicklerRegistry.register[JoinGameWithoutId]
+  PicklerRegistry.register[JoinGameWithId]
   PicklerRegistry.register[CreateGame]
 
   def props(out : ActorRef) = Props(new UserActor(out))
