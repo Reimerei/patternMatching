@@ -3,7 +3,7 @@ package example
 import config.Routes
 import org.scalajs.dom.extensions.Ajax
 import org.scalajs.spickling.PicklerRegistry
-import shared.{CreateGame, JoinGame, ClientSends}
+import shared._
 import scala.scalajs.js
 import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExport
@@ -26,6 +26,8 @@ object SetJS {
   class WSConnection(url: String) {
 
     PicklerRegistry.register[CreateGame]
+    PicklerRegistry.register[JoinGameWithoutId]
+    PicklerRegistry.register[JoinGameWithId]
 
     val socket = new dom.WebSocket(url)
     socket.onmessage = receive _
@@ -33,7 +35,7 @@ object SetJS {
 
     def send(message: ClientSends) = {
       val json = PicklerRegistry.pickle(message)
-      println("sending: " + json)
+      println("sending: " + JSON.stringify(json))
       socket.send(JSON.stringify(json))
     }
 
@@ -43,7 +45,7 @@ object SetJS {
     }
 
     def onStart(e: dom.Event) = {
-      this.send(CreateGame("foo"))
+      this.send(JoinGameWithoutId("foo"))
     }
 
 
