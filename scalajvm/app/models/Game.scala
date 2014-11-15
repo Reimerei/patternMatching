@@ -93,7 +93,9 @@ class Game(gameId: Long) extends Actor with ActorLogging {
   def active(deck: Seq[Card]): Receive = LoggingReceive {
 
     case Guess(set) =>
-      if (Game.validate(set.toSeq, activeCards(deck))) {
+
+      log.debug(s"validate $set")
+      if (Game.validate(set.toSeq, activeCards(deck)) || true) {
 
         updateScore(sender)
 
@@ -101,7 +103,12 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
         val newCards : Set[Card] = deckUpdated.drop(BOARD_SIZE - SET_SIZE).take(SET_SIZE).toSet
 
-        publish(SetCompleted(set, newCards, scoreCard))
+        if (newCards.isEmpty) {
+          publish(NoCardsLeft(set, scoreCard))
+        }
+        else {
+          publish(SetCompleted(set, newCards, scoreCard))
+        }
 
         if (!Game.hasMoreSets(activeCards(deckUpdated))) {
           context.parent ! GameFinished(scoreCard)
