@@ -53,6 +53,10 @@ class UserActor(out : ActorRef) extends Actor {
       out ! pickled
 
       Logger.debug(s"Sent message: $msg")
+  }
 
+  override def postStop() : Unit = {
+    currentGame.foreach( _ ! UserQuit)
+    GameMaster.gameMaster ! UserQuit
   }
 }
