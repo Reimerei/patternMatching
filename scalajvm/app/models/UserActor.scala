@@ -27,11 +27,15 @@ class UserActor(out : ActorRef) extends Actor {
     case msg : JsValue => {
       //val unpickled = PicklerRegistry.unpickle(msg) //TODO
       //pass it on
+
+      //temporary
+      val test = SetCompleted
+      self ! test
+
       Logger.debug(s"Received message: $msg")
     }
     //from game logic
-    case msg : Any => { //TODO: Any -> ServerSend
-      //TODO: handle pickling error?
+    case msg : Any => {
       val pickled : JsValue = PicklerRegistry.pickle(msg)
       out ! pickled
     }
