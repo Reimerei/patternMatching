@@ -16,6 +16,8 @@ object UserActor {
   PicklerRegistry.register[JoinGameWithoutId]
   PicklerRegistry.register[JoinGameWithId]
   PicklerRegistry.register[CreateGame]
+  PicklerRegistry.register[GameCreated]
+  PicklerRegistry.register(GameNotFound)
 
   def props(out : ActorRef) = Props(new UserActor(out))
 }
@@ -59,6 +61,7 @@ class UserActor(out : ActorRef) extends Actor {
       Logger.debug(s"Received message: $msg")
 
     case msg: ServerSend =>
+      Logger.debug(s"Sent message: $msg")
       msg match {
         case _ : GameStart =>
           currentGame = Some(sender())
@@ -68,7 +71,6 @@ class UserActor(out : ActorRef) extends Actor {
       val pickled: JsValue = PicklerRegistry.pickle(msg)
       out ! pickled
 
-      Logger.debug(s"Sent message: $msg")
 
   }
 }

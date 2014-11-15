@@ -1,6 +1,7 @@
 package models
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.event.LoggingReceive
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import shared._
@@ -8,16 +9,16 @@ import shared._
 import scala.util.Random
 
 
-private class GameMaster extends Actor {
-
-  import shared.JoinGame
+private class GameMaster extends Actor with ActorLogging {
 
   var pendingGames: Set[ActorRef] = Set()
 
-  override def receive: Receive = {
+  override def receive: Receive = LoggingReceive {
 
     case msg: JoinGameWithoutId =>
+      log.debug(s"$msg")
       val game: ActorRef = findOrCreateGame()
+      log.debug(s"$game")
       game forward msg
 
     case msg@JoinGameWithId(playerName, gameId) =>
@@ -28,7 +29,8 @@ private class GameMaster extends Actor {
       context.actorOf(Game.props(gameId), name = s"game-$gameId")
       sender ! GameCreated(gameId)
 
-    case GameStart(_, _, _) =>
+    case msg: GameStart =>
+      log.debug(s"$msg")
       pendingGames = pendingGames.filterNot(_ == sender)
   }
 
@@ -42,7 +44,7 @@ private class GameMaster extends Actor {
     pendingGames.head
   }
 
-  def nextId: Long = Random.nextLong()
+  def nextId: Long = math.abs(Random.nextLong())
 
 }
 
