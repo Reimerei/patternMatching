@@ -34,9 +34,12 @@ object Game {
     bits.forall(validateBits)
   }
 
-  def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
-    validateEqualityRule(set)
+  def validateDeckPresence(set: Seq[Card], deck: Set[Card]): Boolean = {
+      set.toSet.subsetOf(deck)
+  }
 
+  def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
+    validateEqualityRule(set) && validateDeckPresence(set, deck)
   }
 
 

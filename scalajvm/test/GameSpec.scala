@@ -22,7 +22,7 @@ class GameSpec extends Specification {
 
     "validate accepts valid set" in {
       val cards = Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))
-      Game.validate(cards, cards.take(cards.length).toSet) must beTrue
+      Game.validate(cards, cards.toSet) must beTrue
     }
 
     "validateEqualityRule accepts valid set" in {
@@ -31,6 +31,16 @@ class GameSpec extends Specification {
 
     "validateEqualityRule rejects invalid set" in {
       Game.validateEqualityRule(Seq(Card(Seq(1, 1, 1)), Card(Seq(1, 1, 1)), Card(Seq(5, 1, 1)))) must beFalse
+    }
+
+    "validateDeckPresence accepts present set" in {
+      val cards = Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))
+      Game.validateDeckPresence(cards, cards.toSet) must beTrue
+    }
+
+    "validateDeckPresence rejects absent set" in {
+      val cards = Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))
+      Game.validateDeckPresence(Seq(Card(Seq(6,6,6))), cards.toSet) must beFalse
     }
   }
 }
