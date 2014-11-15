@@ -1,7 +1,7 @@
 package example
 
 import org.scalajs.dom
-import org.scalajs.jquery.{jQuery => $, JQueryEventObject, JQueryStatic}
+import org.scalajs.jquery.{ jQuery => $, JQueryEventObject, JQueryStatic }
 import org.scalajs.spickling.PicklerRegistry
 import org.scalajs.spickling.jsany._
 import shared._
@@ -32,7 +32,7 @@ object SetJS {
     val scoreCardId = "score-card"
     val boardId = "game-board"
 
-    private var cardsInPlay : List[Card] = Nil
+    private var cardsInPlay: List[Card] = Nil
     private var scoreCard = Map[Player, Int]()
 
     var selectedCards: Seq[Int] = Seq()
@@ -56,13 +56,13 @@ object SetJS {
           scoreCard = updatedScoreCard
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
-          content.appendChild(div(id := boardId){}.render)
+          content.appendChild(div(id := boardId) {}.render)
           content.appendChild(div(id := scoreCardId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
           //TODO: optimize to only map over cardsInPlay once
-          completedSet.zip(newCards).foreach{
-            case (oldCard, newCard) => cardsInPlay = cardsInPlay.map{c => if(c == oldCard) newCard else oldCard}
+          completedSet.zip(newCards).foreach {
+            case (oldCard, newCard) => cardsInPlay = cardsInPlay.map { c => if (c == oldCard) newCard else oldCard }
           }
           scoreCard = updatedScoreCard
           render()
@@ -89,12 +89,12 @@ object SetJS {
     }
 
     def cardSelected(index: Int) = {
-      if(selectedCards.contains(index)) {
+      if (selectedCards.contains(index)) {
         selectedCards = selectedCards.filterNot(_.equals(index))
       } else {
         selectedCards +:= index
-        if(selectedCards.length == 3) {
-//          send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._1))))
+        if (selectedCards.length == 3) {
+//          send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._2)).map(_._1).toSet))
           println("send guess!")
         }
       }
@@ -134,19 +134,19 @@ object SetJS {
         "Waiting For Game..."
       }
 
-      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index, value := index, onclick := { () =>
+      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index, onclick := { () =>
+        println("clicked")
         cardSelected(index)
       }) {
-      card.id.mkString(", ")
-//        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
+        card.id.mkString(", ")
+        //        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
-    }
+      }
 
       def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
-
       def displayGame(cards: List[Card]) = div(`class` := "board") {
-        cards.zipWithIndex.map{case(i, card) => singleCard(i, card)}
+        cards.zipWithIndex.map { case (j, card) => singleCard(j, card) }
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
