@@ -16,7 +16,7 @@ object Game {
       shape <- 0 to 2
       fill <- 0 to 2
       count <- 0 to 2
-    } yield Card(Seq(color, shape, fill, count))
+    } yield Card(List(color, shape, fill, count))
     Random.shuffle(deck)
   }
 

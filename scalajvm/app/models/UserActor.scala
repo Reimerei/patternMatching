@@ -1,23 +1,20 @@
 package models
 
 import akka.actor.{Props, ActorRef, Actor}
+import pickles.Pickles
 import play.api.Logger
 import play.api.libs.json.{JsValue}
 import org.scalajs.spickling._
 import shared._
 import org.scalajs.spickling.playjson._
 
+import scala.collection.immutable.HashMap.HashTrieMap
+import scala.collection.immutable.Map.{Map4, Map3, Map2, Map1}
+
 object UserActor {
-  PicklerRegistry.register[GameStart]
-  PicklerRegistry.register[SetCompleted]
-  PicklerRegistry.register(WrongGuess)
-  PicklerRegistry.register[GameFinished]
-  PicklerRegistry.register[Guess]
-  PicklerRegistry.register[JoinGameWithoutId]
-  PicklerRegistry.register[JoinGameWithId]
-  PicklerRegistry.register[CreateGame]
-  PicklerRegistry.register[GameCreated]
-  PicklerRegistry.register(GameNotFound)
+
+  //hacky initialisation
+  Pickles.register
 
   def props(out : ActorRef) = Props(new UserActor(out))
 }
@@ -46,6 +43,7 @@ class UserActor(out : ActorRef) extends Actor {
             case None => Logger.info("Socket without a game received a game message")
           }
         }
+        case _ => Logger.warn(s"Unknown message $msg")
       }
 
       //temporary
