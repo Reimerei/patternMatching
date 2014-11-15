@@ -20,8 +20,14 @@ object UserActor {
   def props(out : ActorRef) = Props(new UserActor(out))
 }
 
+private trait ForGameMaster[T]
+
 //Handles pickling and unpickling
 class UserActor(out : ActorRef) extends Actor {
+
+  implicit object J1 extends ForGameMaster[JoinGameWithId]
+  implicit object J2 extends  ForGameMaster[JoinGameWithoutId]
+  implicit object Create extends ForGameMaster[CreateGame]
 
   var currentGame : Option[ActorRef] = None
 
@@ -31,11 +37,8 @@ class UserActor(out : ActorRef) extends Actor {
       val unpickled = PicklerRegistry.unpickle(msg)
       //pass it on
       unpickled match {
-        case m : JoinGameWithId =>
-          GameMaster.gameMaster ! m
-        case m : JoinGameWithoutId =>
-          GameMaster.gameMaster ! m
-        case m: CreateGame =>
+        case m : ForGameMaster[_] =>
+          Logger.info("for game master")
           GameMaster.gameMaster ! m
         case m: ClientSends => {
           //send it to the game
