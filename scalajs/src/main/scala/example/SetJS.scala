@@ -16,7 +16,7 @@ import scalatags.JsDom.all._
 import Pickles._
 
 object StdGlobalScope extends js.GlobalScope {
-  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): scalatags.JsDom.Modifier = ???
+  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): JQueryStatic = ???
 }
 
 @JSExport
@@ -134,10 +134,13 @@ object SetJS {
         }
       }
     ) {
-//      card.id.mkString(", ")
-        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
+      card.id.mkString(", ")
+//        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
     }
+
+      def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
+
 
       def displayGame(cards: Set[Card]) = div(`class` := "board") {
         cards.toSeq.map(singleCard)
