@@ -66,7 +66,9 @@ object SetJS {
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
           //TODO: optimize to only map over cardsInPlay once
           completedSet.zip(newCards).foreach {
-            case (oldCard, newCard) => cardsInPlay = cardsInPlay.map { c => if (c == oldCard) newCard else oldCard }
+            case (oldCard, newCard) => {
+              cardsInPlay = cardsInPlay.map(c => if (c == oldCard) newCard else c)
+            }
           }
           scoreCard = updatedScoreCard
           render()
