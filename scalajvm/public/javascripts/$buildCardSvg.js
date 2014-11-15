@@ -1,9 +1,10 @@
-function buildCardSvg(color, shape, pattern, count){
+function buildCardSvg(cssClass, color, shape, pattern, count, selected){
 
-  var W = 200,
+  var W = 170,
       PW = W * 0.05,
       r2 = 0.3,
       r3 = 0.3,
+      padding = 10,
       squareWidth = W*0.2,
       diameter = W*0.1,
       triangleSide = W*0.3;
@@ -37,8 +38,13 @@ function buildCardSvg(color, shape, pattern, count){
 
   //build it
 
+
   var s = Snap(W, W);
-  s.rect(0,0,W,W).attr({fill: '#EEE'});
+  var selecteds = {
+    true: {fill: s.gradient("r(0.5, 0.5, 1.0)#fff-#888"), stroke: 'black', strokeWidth: 2},
+    false: {fill: '#eee'}
+  };
+  s.rect(padding,padding,W-(2*padding),W-(2*padding), padding, padding).attr(selecteds[selected]);
 
   var patterns = [
     //fill
@@ -71,5 +77,6 @@ function buildCardSvg(color, shape, pattern, count){
   for(var i in positions[count])
     patterns[pattern]( shapes[shape](s, positions[count][i]) );
 
-  return $(s.node).detach();
+  $('.'+cssClass).find('svg').remove();
+  $(s.node).detach().appendTo($('.'+cssClass));
 }

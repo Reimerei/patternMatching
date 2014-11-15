@@ -31,8 +31,10 @@ object SetJS {
 
     val scoreCardId = "score-card"
     val boardId = "game-board"
+    val gameFinishedMessageId = "game-finished-message"
 
-    private var cardsInPlay: List[Card] = Nil
+    private var playerName = ""
+    private var cardsInPlay : List[Card] = Nil
     private var scoreCard = Map[Player, Int]()
 
     var selectedCards: Seq[Int] = Seq()
@@ -56,7 +58,8 @@ object SetJS {
           scoreCard = updatedScoreCard
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
-          content.appendChild(div(id := boardId) {}.render)
+          content.appendChild(div(id := gameFinishedMessageId).render)
+          content.appendChild(div(id := boardId){}.render)
           content.appendChild(div(id := scoreCardId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
@@ -66,6 +69,11 @@ object SetJS {
           }
           scoreCard = updatedScoreCard
           render()
+        case GameFinished(finalScoreCard) =>
+          scoreCard = finalScoreCard
+          gameFinished()
+        case WrongGuess =>
+          wrongGuess()
         case x => println("unknown message: " + println(x))
       }
     }
@@ -76,10 +84,25 @@ object SetJS {
     }
 
     def joinGame(name: String) = {
+      playerName = name
       this.send(JoinGameWithoutId(name))
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
+    }
+
+    def gameFinished() = {
+      val (winner, _) = scoreCard.max{case(player, score) => score}
+      val message = if(winner.name == playerName) "You won!" else "You lost!"
+
+      val finishMessage = dom.document.getElementById(gameFinishedMessageId)
+      finishMessage.innerHTML = message
+
+      render()
+    }
+
+    def wrongGuess() = {
+      //TODO
     }
 
     def render() = {
