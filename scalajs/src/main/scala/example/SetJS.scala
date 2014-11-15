@@ -45,6 +45,9 @@ object SetJS {
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
           content.appendChild(WebElements.displayGame(cards).render)
+        case SetCompleted(newCards, scoreCard) =>
+          updateBoard(newCards)
+          updateScoreCard(scoreCard)
         case x => println("unknown message: " + println(x))
       }
     }
@@ -62,6 +65,15 @@ object SetJS {
       val cards = Set(Card(List(1,2,3,4)))
       content.appendChild(WebElements.displayGame(cards).render)
     }
+
+    def updateBoard(newCards : Set[Card]) = {
+      //TODO
+    }
+
+    def updateScoreCard(scoreCard : Map[Player, Int]) = {
+      //TODO
+    }
+
   }
 
   object WebElements {
