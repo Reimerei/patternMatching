@@ -83,6 +83,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
         if (!Game.hasMoreSets(activeCards(deck))) {
+          context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
           self ! PoisonPill
         }

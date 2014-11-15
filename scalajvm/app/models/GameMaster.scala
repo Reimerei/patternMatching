@@ -2,6 +2,7 @@ package models
 
 import akka.actor.{ActorLogging, Actor, ActorRef, Props}
 import akka.event.LoggingReceive
+import akka.persistence.PersistentActor
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import shared._
@@ -9,11 +10,16 @@ import shared._
 import scala.util.Random
 
 
-private class GameMaster extends Actor with ActorLogging {
+private class GameMaster extends PersistentActor with ActorLogging {
 
+  
+  var userRating: Map[String, Int] = Map()
+  
   var pendingGames: Set[ActorRef] = Set()
 
-  override def receive: Receive = LoggingReceive {
+  override def persistenceId: String = "GameMaster"
+
+  override def receiveCommand: Receive = LoggingReceive {
 
     case msg: JoinGameWithoutId =>
       log.debug(s"$msg")
@@ -31,6 +37,9 @@ private class GameMaster extends Actor with ActorLogging {
     case msg: GameStart =>
       log.debug(s"$msg")
       pendingGames = pendingGames.filterNot(_ == sender)
+
+    case msg @ GameFinished(score) => 
+      persist(msg)(x => updateRating(score))
   }
 
 
@@ -45,6 +54,13 @@ private class GameMaster extends Actor with ActorLogging {
 
   def nextId: Long = math.abs(Random.nextLong())
 
+  override def receiveRecover: Receive = {
+    case GameFinished(score) => updateRating(score)
+  }
+
+  def updateRating(score: Map[Player, Int]): Unit = {
+    log.debug(s"Update rating")
+  }
 }
 
 object GameMaster {
