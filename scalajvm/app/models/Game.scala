@@ -93,7 +93,8 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       if (Game.validate(set.toSeq, activeCards(deck))) {
         updateScore(sender)
         context.become(active(deck.drop(3)))
-        publish(SetCompleted(set, scoreCard))
+        val newCards : Set[Card] = Set.empty //TODO
+        publish(SetCompleted(set, newCards, scoreCard))
         if (!Game.hasMoreSets(activeCards(deck))) {
           context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
