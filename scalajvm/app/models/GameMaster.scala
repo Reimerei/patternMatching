@@ -18,7 +18,6 @@ private class GameMaster extends Actor with ActorLogging {
     case msg: JoinGameWithoutId =>
       log.debug(s"$msg")
       val game: ActorRef = findOrCreateGame()
-      log.debug(s"$game")
       game forward msg
 
     case msg@JoinGameWithId(playerName, gameId) =>

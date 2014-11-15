@@ -36,7 +36,7 @@ object Game {
   }
 
   def validateDeckPresence(set: Seq[Card], deck: Set[Card]): Boolean = {
-      set.toSet.subsetOf(deck)
+    set.toSet.subsetOf(deck)
   }
 
   def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
@@ -45,7 +45,7 @@ object Game {
 
 
   def hasMoreSets(deck: Set[Card]): Boolean = {
-    deck.subsets(3) exists {set => validateEqualityRule(set.toSeq)}
+    deck.subsets(3) exists { set => validateEqualityRule(set.toSeq)}
   }
 }
 
@@ -60,18 +60,18 @@ class Game(gameId: Long) extends Actor with ActorLogging {
   override def receive: Receive = pending
 
   def pending: Receive = LoggingReceive {
-    case msg @ JoinGameWithoutId(name) =>
-      log.debug(s"$msg")
-      players += sender() -> (name, 0)
-      if (players.keys.size >= 2){
+    case msg@JoinGameWithoutId(name) =>
+      //      log.debug(s"$msg from $sender")
+      players += sender() ->(name, 0)
+      if (players.keys.size >= 2) {
         val deck: Seq[Card] = Game.createDeck
         context.become(active(deck))
         val state: GameStart = GameStart(activeCards(deck), scoreCard, gameId)
         context.parent ! state
         publish(state)
-        log.debug(s"Start new game: $state")
+        //        log.debug(s"Start new game: $state")
       }
-      
+
     case msg =>
       log.debug(s"Unhandled message: $msg")
   }
@@ -82,7 +82,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
         updateScore(sender)
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
-        if (!Game.hasMoreSets(activeCards(deck))){
+        if (!Game.hasMoreSets(activeCards(deck))) {
           publish(GameFinished(scoreCard))
           self ! PoisonPill
         }
