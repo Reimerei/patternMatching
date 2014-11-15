@@ -69,7 +69,7 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
 
   ];
 
-  var colors = ['red', 'green', 'blue', 'black', 'yellow'];
+  var colors = ['red', 'green', 'blue', 'black', 'purple'];
 
   var positions = [
     //0
