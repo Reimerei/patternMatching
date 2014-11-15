@@ -20,7 +20,7 @@ object UserActor {
   def props(out : ActorRef) = Props(new UserActor(out))
 }
 
-private trait ForGameMaster[T]
+protected trait ForGameMaster[T]
 
 //Handles pickling and unpickling
 class UserActor(out : ActorRef) extends Actor {
