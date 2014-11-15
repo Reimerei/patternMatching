@@ -21,7 +21,7 @@ class GameSpec extends Specification {
   "Game" should {
 
     "validate accepts valid set" in {
-      (new Game(5)).validate(Set(new Card(Seq(1,1,1)), new Card(Seq(2,2,1)), new Card(Seq(3,3,1)))) must beTrue
+      Game.validate(Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))) must beTrue
     }
   }
 }

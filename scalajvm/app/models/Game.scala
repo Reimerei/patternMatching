@@ -7,11 +7,30 @@ import scala.util.Random
 
 object Game {
   def props(gameId: Long): Props = Props(new Game(gameId))
+
+  def validateBits: Seq[Int] => Boolean =
+    s => {
+      val size: Int = s.toSet.size
+      size == 1 || size == s.size
+    }
+
+  def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
+    val n: Int = set.headOption.map(_.id.size).getOrElse(0)
+    val bits: Seq[Seq[Int]] = for {
+      i <- 0 until n
+    } yield set.map(_.id(i))
+
+    bits.forall(validateBits)
+  }
+
+
+  def hasMoreSets(deck: Set[Card]): Boolean = true // TODO
 }
 
 class Game(gameId: Long) extends Actor {
 
   val BOARD_SIZE: Int = 12
+  val SET_SIZE: Int = 3
 
   var players: Map[ActorRef, (String, Int)] = Map()
 
@@ -32,11 +51,11 @@ class Game(gameId: Long) extends Actor {
 
   def active(deck: Seq[Card]): Receive = {
     case Guess(set) =>
-      if (validate(set)) {
+      if (Game.validate(set.toSeq, deck.take(BOARD_SIZE).toSet)) {
         updateScore(sender)
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
-        if (!hasMoreSets)
+        if (!Game.hasMoreSets)
           publish(GameFinished(scoreCard))
       }
       else {
@@ -59,9 +78,6 @@ class Game(gameId: Long) extends Actor {
 
   def scoreCard: Map[Player, Int] = players.values.map(p => Player(p._1) -> p._2).toMap
 
-  def validate(set: Set[Card]): Boolean = false // TODO
-
-  def hasMoreSets: Boolean = true // TODO
 
   def publish(msg: Any): Unit = players.keys.foreach(_ ! msg)
 
