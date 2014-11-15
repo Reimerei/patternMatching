@@ -5,7 +5,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Play with scala.js showcase - @title</title>
+    <title> @title</title>
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")" />
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")" />
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")" />
@@ -29,13 +29,7 @@
             <li><a href="http://www.scala-js.org/" target="_blank">Scala.js</a></li>
             <li><a href="http://www.playframework.com/" target="_blank">Play!</a></li>
           </ul>
-          <form class="navbar-form navbar-right" action="https://github.com/search" method="GET" target="_blank">
-            <input type="hidden" name="nwo" value="hussachai/play-scalajs-showcase" />
-            <input type="hidden" name="search_target" value="repository" />
-            <input type="hidden" name="ref" value="cmdform" />
-            <input type="text" name="q" class="form-control" placeholder="Search...Repo" />
-          </form>
-        </div>
+          </div>
       </div>
     </div>
     <div class="container-fluid">
@@ -44,10 +38,6 @@
           <ul class="nav nav-sidebar">
             <li id="home-page"><a href="@routes.Application.index()">Hello!</a></li>
             <li class="menu"><a href="@routes.SetController.index()">Play Set!</a></li>
-            <li class="menu"><a href="@routes.TodoController.index()">Reactive TodoMVC</a></li>
-            <li class="menu"><a href="@routes.HangmanController.index()">Reactive Hangman</a></li>
-            <li class="menu"><a href="@routes.FileUploadController.index()">HTML5 File Upload</a></li>
-            <li class="menu"><a href="@routes.ChatController.index()">Server Push Chat</a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

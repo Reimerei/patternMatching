@@ -45,6 +45,7 @@ object ApplicationBuild extends Build with UniversalKeys {
       dist <<= dist dependsOn (fullOptJS in (scalajs, Compile)),
       stage <<= stage dependsOn (fullOptJS in (scalajs, Compile)),
       libraryDependencies ++= Dependencies.scalajvm.value,
+      resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))( Resolver.ivyStylePatterns),  
       EclipseKeys.skipParents in ThisBuild := false,
       commands += preStartCommand
     ) ++ (
@@ -114,8 +115,9 @@ object Dependencies {
     "org.webjars" % "jquery" % "2.1.1",
     "org.webjars" % "codemirror" % "4.3",
     "org.webjars" % "bootstrap" % "3.2.0",
-    "org.webjars" % "font-awesome" % "4.1.0"
-  ))
+    "org.webjars" % "font-awesome" % "4.1.0",
+    "org.scalajs" %% "scalajs-pickling-play-json" % "0.3.1"
+  ) )
 
   val scalajs = Def.setting(shared.value ++ Seq(
     "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % Versions.scalajsDom,
@@ -123,7 +125,8 @@ object Dependencies {
     "com.lihaoyi" %%% "upickle" % "0.2.4",
     "com.scalatags" %%% "scalatags" % "0.4.0",
     "com.scalarx" %%% "scalarx" % "0.2.6",
-    "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
+    "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6",
+    "org.scalajs" %%% "scalajs-pickling" % "0.3.1"
   ))
 }
 
