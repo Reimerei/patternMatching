@@ -32,7 +32,7 @@ object SetJS {
     val scoreCardId = "score-card"
     val boardId = "game-board"
 
-    private var cardsInPlay : Set[Card] = Set.empty
+    private var cardsInPlay : List[Card] = Nil
     private var scoreCard = Map[Player, Int]()
 
     Pickles.register()
@@ -50,7 +50,7 @@ object SetJS {
       val json = js.JSON.parse(e.data.toString).asInstanceOf[js.Any]
       PicklerRegistry.unpickle(json) match {
         case GameStart(cards, updatedScoreCard, gameId) =>
-          cardsInPlay = cards
+          cardsInPlay = cards.toList
           scoreCard = updatedScoreCard
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
@@ -58,7 +58,11 @@ object SetJS {
           content.appendChild(div(id := scoreCardId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
-          cardsInPlay = (cardsInPlay -- completedSet) ++ newCards
+          val zipped = completedSet.zip(newCards)
+          //TODO: optimize to only map over cardsInPlay once
+          completedSet.zip(newCards).foreach{
+            case (oldCard, newCard) => cardsInPlay = cardsInPlay.map{c => if(c == oldCard) newCard else oldCard}
+          }
           scoreCard = updatedScoreCard
           render()
         case x => println("unknown message: " + println(x))
