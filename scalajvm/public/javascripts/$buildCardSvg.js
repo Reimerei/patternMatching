@@ -1,6 +1,6 @@
-function $buildCardSvg(color, shape, pattern, count){
+function buildCardSvg(color, shape, pattern, count){
 
-  var W = 300,
+  var W = 200,
       PW = W * 0.05,
       r2 = 0.3,
       r3 = 0.3,
