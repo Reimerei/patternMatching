@@ -16,7 +16,7 @@ import scalatags.JsDom.all._
 import Pickles._
 
 object StdGlobalScope extends js.GlobalScope {
-  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): Any = ???
+  def buildCardSvg(className: String, color: Int, shape: Int, pattern: Int, count: Int, isSelected: Boolean): Any = ???
 }
 
 @JSExport
@@ -110,6 +110,10 @@ object SetJS {
       board.innerHTML = ""
       board.appendChild(WebElements.displayGame(cardsInPlay).render)
       updateScoreCard()
+      cardsInPlay.zipWithIndex.foreach{
+        case (card, i) =>
+          StdGlobalScope.buildCardSvg("c_" + i, card.id(0), card.id(1), card.id(2), card.id(3), false)
+      }
     }
 
     def cardSelected(index: Int) = {
@@ -159,21 +163,14 @@ object SetJS {
         "Waiting For Game..."
       }
 
-      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index, onclick := { () =>
+      def singleCard(card: Card, index: Int) = div(`class` := "c_" + index + " col-xs-4", onclick := { () =>
         println("clicked")
         cardSelected(index)
-      }) {
-        card.id.mkString(", ")
-        //        StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
+      }) { }
 
-      }
-
-      def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
-
-      def displayGame(cards: List[Card]) = div(`class` := "board") {
-        cards.zipWithIndex.map { case (j, card) =>
-
-          singleCard(j, card) }
+      def displayGame(cards: List[Card]) = div(`class` := "row") {
+        cards.zipWithIndex.map { case (card,j) =>
+          singleCard(card, j) }
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
