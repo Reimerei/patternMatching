@@ -52,8 +52,8 @@ object SetJS {
           content.appendChild(WebElements.displayGame(cards).render)
           content.appendChild(div(id := scoreCardId){}.render)
           updateScoreCard(scoreCard)
-        case SetCompleted(newCards, scoreCard) =>
-          updateBoard(newCards)
+        case SetCompleted(completedSet, newCards, scoreCard) =>
+          updateBoard(completedSet, newCards)
           updateScoreCard(scoreCard)
         case x => println("unknown message: " + println(x))
       }
@@ -73,7 +73,7 @@ object SetJS {
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
-    def updateBoard(newCards: Set[Card]) = {
+    def updateBoard(completedSet : Set[Card], newCards: Set[Card]) = {
       //TODO
     }
 

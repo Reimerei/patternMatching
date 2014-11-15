@@ -10,7 +10,7 @@ case class Card(id: List[Int])
 // Client receives
 trait ServerSend
 case class GameStart(cards: Set[Card], scoreCard: Map[Player, Int], gameId: Long) extends ServerSend
-case class SetCompleted(cards: Set[Card], scoreCard: Map[Player, Int]) extends ServerSend
+case class SetCompleted(completedSet: Set[Card], newCards : Set[Card], scoreCard: Map[Player, Int]) extends ServerSend
 case object WrongGuess extends ServerSend
 case class GameFinished(scoreCard: Map[Player, Int]) extends ServerSend
 case class GameCreated(gameId: Long) extends ServerSend
