@@ -92,7 +92,7 @@ object SetJS {
     }
 
     def gameFinished() = {
-      val (winner, _) = scoreCard.max{case(player, score) => score}
+      val (winner, _) = scoreCard.maxBy{case(player, score) => score}
       val message = if(winner.name == playerName) "You won!" else "You lost!"
 
       val finishMessage = dom.document.getElementById(gameFinishedMessageId)
