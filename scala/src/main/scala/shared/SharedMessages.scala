@@ -17,5 +17,7 @@ case class GameFinished(scoreCard: Map[Player, Int]) extends ServerSend
 // Client sends
 trait ClientSends
 case class Guess(cards: Set[Card]) extends ClientSends
-case class JoinGame(playerName: String, gameId: Option[Long]) extends ClientSends
 case class CreateGame(playerName: String) extends ClientSends
+trait JoinGame extends ClientSends
+case class JoinGameWithoutId(playerName: String) extends JoinGame
+case class JoinGameWithId(playerName: String, gameId: Long) extends JoinGame
