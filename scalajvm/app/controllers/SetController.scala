@@ -1,6 +1,7 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{WebSocket, Action, Controller}
+import models.UserActor
 
 /**
  * User: Björn Reimer
@@ -11,6 +12,11 @@ object SetController extends Controller {
 
   def index = Action { implicit request =>
     Ok(views.html.set())
+  }
+
+  def socket = WebSocket.acceptWithActor[String, String] {
+    request => out =>
+      UserActor.props(out)
   }
 
 }
