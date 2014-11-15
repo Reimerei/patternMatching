@@ -51,9 +51,9 @@ class UserActor(out : ActorRef) extends Actor {
 
     case msg: ServerSend =>
       msg match {
-        case GameStart =>
+        case _ : GameStart =>
           currentGame = Some(sender())
-        case GameFinished =>
+        case _ : GameFinished =>
           currentGame = None
       }
       val pickled: JsValue = PicklerRegistry.pickle(msg)
