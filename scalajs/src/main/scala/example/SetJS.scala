@@ -5,6 +5,7 @@ import org.scalajs.dom.extensions.Ajax
 import org.scalajs.spickling.PicklerRegistry
 import shared.{CreateGame, JoinGame, ClientSends}
 import scala.scalajs.js
+import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExport
 import js.Dynamic.{ global => g }
 import org.scalajs.dom
@@ -33,7 +34,7 @@ object SetJS {
     def send(message: ClientSends) = {
       val json = PicklerRegistry.pickle(message)
       println("sending: " + json)
-      socket.send(json)
+      socket.send(JSON.stringify(json))
     }
 
     def receive(e: dom.MessageEvent) = {
