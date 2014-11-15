@@ -30,6 +30,10 @@ object SetJS {
   class SetClient(url: String) {
 
     val scoreCardId = "score-card"
+    val boardId = "game-board"
+
+    private var cardsInPlay : List[Card] = Nil
+    private var scoreCard = Map[Player, Int]()
 
     var selectedCards: Seq[Int] = Seq()
 
@@ -47,15 +51,21 @@ object SetJS {
     def receive(e: dom.MessageEvent) = {
       val json = js.JSON.parse(e.data.toString).asInstanceOf[js.Any]
       PicklerRegistry.unpickle(json) match {
-        case GameStart(cards, scoreCard, gameId) =>
+        case GameStart(cards, updatedScoreCard, gameId) =>
+          cardsInPlay = cards.toList
+          scoreCard = updatedScoreCard
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
-          content.appendChild(WebElements.displayGame(cards).render)
+          content.appendChild(div(id := boardId){}.render)
           content.appendChild(div(id := scoreCardId) {}.render)
-          updateScoreCard(scoreCard)
-        case SetCompleted(completedSet, newCards, scoreCard) =>
-          updateBoard(completedSet, newCards)
-          updateScoreCard(scoreCard)
+          render()
+        case SetCompleted(completedSet, newCards, updatedScoreCard) =>
+          //TODO: optimize to only map over cardsInPlay once
+          completedSet.zip(newCards).foreach{
+            case (oldCard, newCard) => cardsInPlay = cardsInPlay.map{c => if(c == oldCard) newCard else oldCard}
+          }
+          scoreCard = updatedScoreCard
+          render()
         case x => println("unknown message: " + println(x))
       }
     }
@@ -70,8 +80,14 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = Set(Card(List(1, 2, 3, 4)))
+      val cards = List(Card(List(1, 2, 3, 4)))
       content.appendChild(WebElements.displayGame(cards).render)
+    }
+
+    def render() = {
+      val board = dom.document.getElementById(boardId)
+      board.innerHTML = WebElements.displayGame(cardsInPlay).render.outerHTML
+      updateScoreCard()
     }
 
     def cardSelected(index: Int) = {
@@ -87,11 +103,7 @@ object SetJS {
       println("selected cards: " + selectedCards)
     }
 
-    def updateBoard(completedSet: Set[Card], newCards: Set[Card]) = {
-      //TODO
-    }
-
-    def updateScoreCard(scoreCard: Map[Player, Int]) = {
+    def updateScoreCard() = {
       val scorecard = dom.document.getElementById(scoreCardId)
       scorecard.innerHTML = WebElements.scorecard(scoreCard).render.outerHTML
     }
@@ -135,8 +147,13 @@ object SetJS {
       def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
 
+<<<<<<< HEAD
       def displayGame(cards: Set[Card]) = div(`class` := "board") {
         cards.toSeq.zipWithIndex.map{case (i, card) => singleCard(i, card)}
+=======
+      def displayGame(cards: List[Card]) = div(`class` := "board") {
+        cards.map(singleCard)
+>>>>>>> origin/master
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
