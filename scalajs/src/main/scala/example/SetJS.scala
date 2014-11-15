@@ -84,7 +84,8 @@ object SetJS {
 
     def render() = {
       val board = dom.document.getElementById(boardId)
-      board.innerHTML = WebElements.displayGame(cardsInPlay).render.outerHTML
+      board.innerHTML = ""
+      board.appendChild(WebElements.displayGame(cardsInPlay).render)
       updateScoreCard()
     }
 
@@ -94,8 +95,9 @@ object SetJS {
       } else {
         selectedCards +:= index
         if (selectedCards.length == 3) {
-//          send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._2)).map(_._1).toSet))
+          send(Guess(cardsInPlay.zipWithIndex.filter(card => selectedCards.contains(card._2)).map(_._1).toSet))
           println("send guess!")
+          selectedCards = Seq()
         }
       }
       println("selected cards: " + selectedCards)
@@ -146,7 +148,9 @@ object SetJS {
       def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
       def displayGame(cards: List[Card]) = div(`class` := "board") {
-        cards.zipWithIndex.map { case (j, card) => singleCard(j, card) }
+        cards.zipWithIndex.map { case (j, card) =>
+
+          singleCard(j, card) }
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
