@@ -1,12 +1,13 @@
 package models
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
+import play.api.libs.concurrent.Akka
 import shared.{GameStart, CreateGame}
-
+import play.api.Play.current
 import scala.util.Random
 
 
-class GameMaster extends Actor {
+private class GameMaster extends Actor {
 
   import shared.JoinGame
 
@@ -35,4 +36,8 @@ class GameMaster extends Actor {
     pendingGames.head
   }
 
+}
+
+object GameMaster {
+  val gameMaster = Akka.system.actorOf(Props[GameMaster])
 }

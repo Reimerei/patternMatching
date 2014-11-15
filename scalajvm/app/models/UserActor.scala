@@ -22,23 +22,42 @@ object UserActor {
 //Handles pickling and unpickling
 class UserActor(out : ActorRef) extends Actor {
 
+  var currentGame : Option[ActorRef] = None
+
   def receive = {
     //from websocket
-    case msg : JsValue => {
-      //val unpickled = PicklerRegistry.unpickle(msg) //TODO
+    case msg: JsValue =>
+      val unpickled = PicklerRegistry.unpickle(msg)
       //pass it on
+      unpickled match {
+        case m@(JoinGame | CreateGame) => {
+          //send it to the game master
+          GameMaster.gameMaster ! m
+        }
+        case m: ClientSends => {
+          //send it to the game
+          currentGame match {
+            case Some(g) => g ! m
+            case None => Logger.info("Socket without a game received a game message")
+          }
+        }
+      }
 
       //temporary
       val test = SetCompleted
       self ! test
 
       Logger.debug(s"Received message: $msg")
-    }
-    //from game logic
-    case msg : Any => {
-      val pickled : JsValue = PicklerRegistry.pickle(msg)
-      out ! pickled
-    }
-  }
 
+    case msg: ServerSend =>
+      msg match {
+        case GameStart =>
+          currentGame = Some(sender())
+        case GameFinished =>
+          currentGame = None
+      }
+      val pickled: JsValue = PicklerRegistry.pickle(msg)
+      out ! pickled
+
+  }
 }
