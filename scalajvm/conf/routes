@@ -29,7 +29,7 @@ GET           /chat/ws/:username           controllers.ChatController.chatWS(use
 GET           /chat/sse/:username          controllers.ChatController.chatSSE(username: String)
 POST          /chat/talk                   controllers.ChatController.talk
 
-GET             /set                        controllers.SetController.index
+GET           /set                         controllers.SetController.index
 GET           /set/ws                      controllers.SetController.socket
 
 # Map static resources from the /public folder to the /assets URL path
