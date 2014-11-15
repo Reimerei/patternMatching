@@ -19,14 +19,25 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
 
     //typesafe
     function(s,pos){
-        //first I'll build a square
-        //var square = shapes[0](s,pos);
+        var width = squareWidth*1.3;
+        var vbWidth = 174.0;
 
-        //let's scale it down without fucking up the pattern
-        var svg = s.svg(pos[0]-(squareWidth/2.0),pos[1]-(squareWidth/2.0),squareWidth, squareWidth, 0, 0, 154,154 );
+        var svg = s.svg(pos[0]-(width/2.0),pos[1]-(width/2.0),width, width, -10, -10, vbWidth, vbWidth );
         var p = svg.path("M49.7 114c-4.8 0-8.7-5.1-8.7-9.9v-.2c0-4.8 3.9-7.9 8.7-7.9h100c.9-3 1.6-7 2-11h-84c-4.8 0-8.7-3.7-8.7-8.5s3.9-8.5 8.7-8.5h83.7c-.5-4-1.2-8-2.3-11h-63.4c-4.8 0-8.7-3.7-8.7-8.5s3.9-8.5 8.7-8.5h56c-13.1-23-37.2-37.8-64.7-37.8-41.4 0-75 33.3-75 74.7s33.6 75.6 75 75.6c28.4 0 53.1-15.4 65.8-38.4h-93.1z");
 
-        svg.scaledBy = squareWidth/154.0;
+        svg.scaledBy = squareWidth/vbWidth;
+
+        return svg;
+    },
+
+    //play logo
+    function(s, pos){
+        var width = squareWidth*1.3;
+        var vbWidth = 265.0;
+        var svg = s.svg(pos[0]-(width/2.0), pos[1]-(width/2.0), width, width, -52.5, 0, vbWidth, vbWidth);
+        svg.path("M17.8 23.9l6.2-6.2c9.5-9.4 25-8.8 33.7 1.3l85.8 100c7.5 8.7 7.4 21.6-.2 30.2l-85.5 96.9c-8.8 9.9-24.1 10.4-33.5 1l-6.3-6.1c-8.4-8.4-9-21.8-1.4-31l51.2-61.4c7-8.4 7.1-20.5.3-29.1l-52-65c-7.4-9.1-6.6-22.3 1.7-30.6z");
+
+        svg.scaledBy = squareWidth/vbWidth;
 
         return svg;
     },
@@ -91,7 +102,7 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
     },
     //diagonal lines
     function(el){
-        var width=PW*0.8 /el.scaledBy;
+        var width=PW*0.6 /el.scaledBy;
         var wh = width/2.0;
         var pattern = s.path("M 0 "+wh+" L "+wh+" 0 M "+wh+" "+width+" L "+width+" "+wh)
             .attr({strokeWidth: Math.sqrt(2*wh), stroke: colors[color], strokeLinecap: 'square'})
