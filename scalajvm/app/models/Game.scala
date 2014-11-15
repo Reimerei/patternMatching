@@ -43,7 +43,9 @@ object Game {
   }
 
 
-  def hasMoreSets(deck: Set[Card]): Boolean = true // TODO
+  def hasMoreSets(deck: Set[Card]): Boolean = {
+    deck.subsets(3) exists {set => validateEqualityRule(set.toSeq)}
+  }
 }
 
 class Game(gameId: Long) extends Actor {

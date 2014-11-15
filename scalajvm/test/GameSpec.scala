@@ -42,5 +42,12 @@ class GameSpec extends Specification {
       val cards = Seq(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))
       Game.validateDeckPresence(Seq(Card(Seq(6,6,6))), cards.toSet) must beFalse
     }
+
+    "hasMoreSets is true when there is more combinations" in {
+      Game.hasMoreSets(Set(Card(Seq(1,1,1)), Card(Seq(2,2,1)), Card(Seq(3,3,1)))) must beTrue
+    }
+    "hasMoreSets is false when there is no more combinations" in {
+      Game.hasMoreSets(Set(Card(Seq(1,1,1)), Card(Seq(2,2,1)))) must beFalse
+    }
   }
 }
