@@ -64,6 +64,10 @@ object SetJS {
           }
           scoreCard = updatedScoreCard
           render()
+        case GameFinished =>
+          gameFinished()
+        case WrongGuess =>
+          wrongGuess()
         case x => println("unknown message: " + println(x))
       }
     }
@@ -80,6 +84,14 @@ object SetJS {
       content.appendChild(WebElements.waitingForGame.render)
       val cards = List(Card(List(1, 2, 3, 4)))
       content.appendChild(WebElements.displayGame(cards).render)
+    }
+
+    def gameFinished() = {
+      //TODO
+    }
+
+    def wrongGuess() = {
+      //TODO
     }
 
     def render() = {
