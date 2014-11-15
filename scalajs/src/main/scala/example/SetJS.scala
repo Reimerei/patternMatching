@@ -25,6 +25,8 @@ object SetJS {
 
   class SetClient(url: String) {
 
+    val scoreCardId = "score-card"
+
     Pickles.register()
 
     val socket = new dom.WebSocket(url)
@@ -44,6 +46,7 @@ object SetJS {
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
           content.appendChild(WebElements.displayGame(cards).render)
+          content.appendChild(div(id := scoreCardId){}.render)
           updateScoreCard(scoreCard)
         case SetCompleted(newCards, scoreCard) =>
           updateBoard(newCards)
@@ -62,18 +65,24 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = Set(Card(List(1,2,3,4)))
+      val cards = Set(Card(List(1, 2, 3, 4)))
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
-    def updateBoard(newCards : Set[Card]) = {
+    def updateBoard(newCards: Set[Card]) = {
       //TODO
     }
 
-    def updateScoreCard(scoreCard : Map[Player, Int]) = {
-      //TODO
+    def updateScoreCard(scoreCard: Map[Player, Int]) = {
+      val scorecard = dom.document.getElementById(scoreCardId)
+      val headers = tr(th("Player"), th("Score"))
+      val data = scoreCard.map {
+        case (player, score) =>
+          tr(td(player.name), td(score))
+      }
+      val t = table(tbody(List(headers) ++ data))
+      scorecard.innerHTML = t.render.outerHTML
     }
-
   }
 
   object WebElements {
