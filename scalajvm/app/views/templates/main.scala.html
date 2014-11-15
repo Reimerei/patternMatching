@@ -36,7 +36,6 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li id="home-page"><a href="@routes.Application.index()">Hello!</a></li>
             <li class="menu"><a href="@routes.SetController.index()">Play Set!</a></li>
           </ul>
         </div>
@@ -75,10 +74,10 @@
     </script>
 
     @if(Play.isDev(Play.current)) {
-        <script src="@routes.Assets.at("javascripts/scalajs-example-fastopt.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/scalajs-set-fastopt.js")" type="text/javascript"></script>
     }else {
         <!-- for production (play dist), use the optimized version instead -->
-        <script src="@routes.Assets.at("javascripts/scalajs-example-opt.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/scalajs-set-opt.js")" type="text/javascript"></script>
     }
 
     @javascripts
