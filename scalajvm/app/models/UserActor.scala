@@ -20,14 +20,8 @@ object UserActor {
   def props(out : ActorRef) = Props(new UserActor(out))
 }
 
-protected trait ForGameMaster[T]
-
 //Handles pickling and unpickling
 class UserActor(out : ActorRef) extends Actor {
-
-  implicit object J1 extends ForGameMaster[JoinGameWithId]
-  implicit object J2 extends  ForGameMaster[JoinGameWithoutId]
-  implicit object Create extends ForGameMaster[CreateGame]
 
   var currentGame : Option[ActorRef] = None
 
