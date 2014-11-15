@@ -80,8 +80,6 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = List(Card(List(1, 2, 3, 4)))
-      content.appendChild(WebElements.displayGame(cards).render)
     }
 
     def render() = {
@@ -147,13 +145,8 @@ object SetJS {
       def singleCardSvg(card: Card) = StdGlobalScope.buildCardSvg(card.id(0), card.id(1), card.id(2), card.id(3))
 
 
-<<<<<<< HEAD
-      def displayGame(cards: Set[Card]) = div(`class` := "board") {
-        cards.toSeq.zipWithIndex.map{case (i, card) => singleCard(i, card)}
-=======
       def displayGame(cards: List[Card]) = div(`class` := "board") {
-        cards.map(singleCard)
->>>>>>> origin/master
+        cards.zipWithIndex.map{case(i, card) => singleCard(i, card)}
       }
 
       def scorecard(scoreCard: Map[Player, Int]) = {
