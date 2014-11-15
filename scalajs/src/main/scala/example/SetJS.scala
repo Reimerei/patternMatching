@@ -78,13 +78,7 @@ object SetJS {
 
     def updateScoreCard(scoreCard: Map[Player, Int]) = {
       val scorecard = dom.document.getElementById(scoreCardId)
-      val headers = tr(th("Player"), th("Score"))
-      val data = scoreCard.map {
-        case (player, score) =>
-          tr(td(player.name), td(score))
-      }
-      val t = table(tbody(List(headers) ++ data))
-      scorecard.innerHTML = t.render.outerHTML
+      scorecard.innerHTML = WebElements.scorecard(scoreCard).render.outerHTML
     }
 
     object WebElements {
@@ -142,6 +136,16 @@ object SetJS {
       def displayGame(cards: Set[Card]) = div(`class` := "board") {
         cards.toSeq.map(singleCard)
       }
+
+      def scorecard(scoreCard: Map[Player, Int]) = {
+        val headers = tr(th("Player"), th("Score"))
+        val data = scoreCard.map {
+          case (player, score) =>
+            tr(td(player.name), td(score))
+        }
+        table(tbody(List(headers) ++ data))
+      }
+
     }
 
   }
