@@ -59,10 +59,10 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
+      val cards = Set(Card(Seq(1,2,3,4)))
+      content.appendChild(WebElements.displayGame(cards).render)
     }
   }
-
-
 
   object WebElements {
 
@@ -92,15 +92,15 @@ object SetJS {
       "Waiting For Game..."
     }
 
-    def singleCard(card: Card) = {
-
+    def singleCard(card: Card) = div(`class` := "card"){
+       card.id.mkString(", ")
     }
 
-//    def renderGame(cards: Set[Card])
-
+    def displayGame(cards: Set[Card])  = div(`class` := "board"){
+      cards.toSeq.map(singleCard)
+    }
 
   }
-
 
 }
 
