@@ -30,6 +30,10 @@ object SetJS {
   class SetClient(url: String) {
 
     val scoreCardId = "score-card"
+    val boardId = "game-board"
+
+    private var cardsInPlay : Set[Card] = Set.empty
+    private var scoreCard = Map[Player, Int]()
 
     Pickles.register()
 
@@ -45,15 +49,18 @@ object SetJS {
     def receive(e: dom.MessageEvent) = {
       val json = js.JSON.parse(e.data.toString).asInstanceOf[js.Any]
       PicklerRegistry.unpickle(json) match {
-        case GameStart(cards, scoreCard, gameId) =>
+        case GameStart(cards, updatedScoreCard, gameId) =>
+          cardsInPlay = cards
+          scoreCard = updatedScoreCard
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
-          content.appendChild(WebElements.displayGame(cards).render)
+          content.appendChild(div(id := boardId){}.render)
           content.appendChild(div(id := scoreCardId) {}.render)
-          updateScoreCard(scoreCard)
-        case SetCompleted(completedSet, newCards, scoreCard) =>
-          updateBoard(completedSet, newCards)
-          updateScoreCard(scoreCard)
+          render()
+        case SetCompleted(completedSet, newCards, updatedScoreCard) =>
+          cardsInPlay = (cardsInPlay -- completedSet) ++ newCards
+          scoreCard = updatedScoreCard
+          render()
         case x => println("unknown message: " + println(x))
       }
     }
@@ -72,11 +79,13 @@ object SetJS {
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
-    def updateBoard(completedSet: Set[Card], newCards: Set[Card]) = {
-      //TODO
+    def render() = {
+      val board = dom.document.getElementById(boardId)
+      board.innerHTML = WebElements.displayGame(cardsInPlay).render.outerHTML
+      updateScoreCard()
     }
 
-    def updateScoreCard(scoreCard: Map[Player, Int]) = {
+    def updateScoreCard() = {
       val scorecard = dom.document.getElementById(scoreCardId)
       scorecard.innerHTML = WebElements.scorecard(scoreCard).render.outerHTML
     }
