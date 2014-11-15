@@ -80,7 +80,7 @@ object Pickles {
     PicklerRegistry.register[Set1[Any]]
     PicklerRegistry.register[Set2[Any]]
     PicklerRegistry.register[Set3[Any]]
-    PicklerRegistry. register[Set4[Any]]
+    PicklerRegistry.register[Set4[Any]]
     PicklerRegistry.register[HashTrieSet[Any]]
 
     PicklerRegistry.register[Map[Any, Any]]
@@ -100,6 +100,8 @@ object Pickles {
     PicklerRegistry.register[CreateGame]
     PicklerRegistry.register[GameCreated]
     PicklerRegistry.register(GameNotFound)
+    PicklerRegistry.register(UserQuit)
+    PicklerRegistry.register[OtherUserQuit]
     PicklerRegistry.register[Card]
     PicklerRegistry.register[Player]
     PicklerRegistry.register[Map[Any, Any]]

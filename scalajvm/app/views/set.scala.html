@@ -3,6 +3,9 @@
 
 @header = {
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chat.css")" />
+    <script src="@routes.Assets.at("javascripts/snap.svg-min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/$buildCardSvg.js")" type="text/javascript"></script>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chat.css")" />
 }
 @templates.main("Play Set!", header = header){
     <script src="@routes.Assets.at("javascripts/jquery.cookie.js")" type="text/javascript"></script>

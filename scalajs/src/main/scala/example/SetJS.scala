@@ -25,6 +25,8 @@ object SetJS {
 
   class SetClient(url: String) {
 
+    val scoreCardId = "score-card"
+
     Pickles.register()
 
     val socket = new dom.WebSocket(url)
@@ -43,9 +45,10 @@ object SetJS {
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
           content.appendChild(WebElements.displayGame(cards).render)
+          content.appendChild(div(id := scoreCardId){}.render)
           updateScoreCard(scoreCard)
-        case SetCompleted(newCards, scoreCard) =>
-          updateBoard(newCards)
+        case SetCompleted(completedSet, newCards, scoreCard) =>
+          updateBoard(completedSet, newCards)
           updateScoreCard(scoreCard)
         case x => println("unknown message: " + println(x))
       }
@@ -65,37 +68,45 @@ object SetJS {
       content.appendChild(WebElements.displayGame(cards).render)
     }
 
-    def updateBoard(newCards: Set[Card]) = {
+    def updateBoard(completedSet : Set[Card], newCards: Set[Card]) = {
       //TODO
     }
 
     def updateScoreCard(scoreCard: Map[Player, Int]) = {
-      //TODO
-    }
-
-    object WebElements {
-
-      def enterName() = div(id := "signInPanel") {
-        form(`class` := "form-inline", "role".attr := "form")(
-          div(id := "usernameForm", `class` := "form-group")(
-            div(`class` := "input-group")(
-              div(`class` := "input-group-addon", raw("&#9786;")),
-              input(id := "username", `class` := "form-control", `type` := "text", placeholder := "Enter username")
-            )
-          ),
-          span(style := "margin:0px 5px"),
-          button(`class` := "btn btn-default", onclick := { () =>
-            val input = $("#username").value().toString.trim
-            if (input == "") {
-              $("#usernameForm").addClass("has-error")
-              dom.alert("Invalid username")
-            } else {
-              joinGame(input)
-            }
-            false
-          })("Sign in")
-        )
+      val scorecard = dom.document.getElementById(scoreCardId)
+      val headers = tr(th("Player"), th("Score"))
+      val data = scoreCard.map {
+        case (player, score) =>
+          tr(td(player.name), td(score))
       }
+      val t = table(tbody(List(headers) ++ data))
+      scorecard.innerHTML = t.render.outerHTML
+    }
+  }
+
+  object WebElements {
+
+    def enterName(client: SetClient) = div(id := "signInPanel") {
+      form(`class` := "form-inline", "role".attr := "form")(
+        div(id := "usernameForm", `class` := "form-group")(
+          div(`class` := "input-group")(
+            div(`class` := "input-group-addon", raw("&#9786;")),
+            input(id := "username", `class` := "form-control", `type` := "text", placeholder := "Enter username")
+          )
+        ),
+        span(style := "margin:0px 5px"),
+        button(`class` := "btn btn-default", onclick := { () =>
+          val input = $("#username").value().toString.trim
+          if (input == "") {
+            $("#usernameForm").addClass("has-error")
+            dom.alert("Invalid username")
+          } else {
+             client.joinGame(input)
+          }
+          false
+        })("Sign in")
+      )
+    }
 
       def waitingForGame = div() {
         "Waiting For Game..."

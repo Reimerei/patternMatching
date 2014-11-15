@@ -74,6 +74,16 @@ class Game(gameId: Long) extends Actor with ActorLogging {
         //        log.debug(s"Start new game: $state")
       }
 
+    case UserQuit =>
+      log.debug("User quit")
+      players.find(_._1 == sender).map {
+        player =>
+          players = players.updated(sender, players(sender).copy(connected = false))
+          if (players.values.forall(!_.connected)) {
+            self ! PoisonPill
+          }
+      }
+
     case msg =>
       log.debug(s"Unhandled message: $msg")
   }
@@ -83,8 +93,10 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       if (Game.validate(set.toSeq, activeCards(deck))) {
         updateScore(sender)
         context.become(active(deck.drop(3)))
-        publish(SetCompleted(set, scoreCard))
+        val newCards : Set[Card] = Set.empty //TODO
+        publish(SetCompleted(set, newCards, scoreCard))
         if (!Game.hasMoreSets(activeCards(deck))) {
+          context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
           self ! PoisonPill
         }
@@ -94,14 +106,15 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       }
 
     case UserQuit =>
-      players.find(_ == sender).map {
+      log.debug("User quit")
+      players.find(_._1 == sender).map {
         player =>
           players = players.updated(sender, players(sender).copy(connected = false))
           if (players.values.forall(!_.connected)) {
             self ! PoisonPill
           }
           else {
-            publish(OtherUserQuit(Player(player._2.name)))
+            players.filter(_._2.connected).keys.foreach(_ ! OtherUserQuit(Player(player._2.name)))
           }
       }
   }

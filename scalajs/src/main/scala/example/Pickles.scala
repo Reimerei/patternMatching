@@ -100,6 +100,8 @@ object Pickles {
     PicklerRegistry.register[CreateGame]
     PicklerRegistry.register[GameCreated]
     PicklerRegistry.register(GameNotFound)
+    PicklerRegistry.register(UserQuit)
+    PicklerRegistry.register[OtherUserQuit]
     PicklerRegistry.register[Card]
     PicklerRegistry.register[Player]
     PicklerRegistry.register[Map[Any, Any]]
