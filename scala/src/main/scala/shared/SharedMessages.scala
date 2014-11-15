@@ -5,7 +5,7 @@ object SharedMessages {
 }
 
 case class Player(name: String)
-case class Card(id: Seq[Int])
+case class Card(id: List[Int])
 
 // Client receives
 trait ServerSend
