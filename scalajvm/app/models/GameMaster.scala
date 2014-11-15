@@ -10,10 +10,10 @@ import shared._
 import scala.util.Random
 
 
-private class GameMaster extends PersistentActor with ActorLogging {
+private class GameMaster extends PersistentActor with ActorLogging with EloRating {
 
   
-  var userRating: Map[String, Int] = Map()
+  var userRatings: Map[String, Int] = Map()
   
   var pendingGames: Set[ActorRef] = Set()
 
