@@ -18,7 +18,6 @@ import Pickles._
 @JSExport
 object SetJS {
 
-
   @JSExport
   def main(wsUrl: String) = {
     val setClient = new SetClient(wsUrl)
@@ -92,9 +91,11 @@ object SetJS {
       "Waiting For Game..."
     }
 
-    def singleCard(card: Card) = div(`class` := "card" ){
+    def singleCard(card: Card) = div(`class` := "card", onclick := { () =>
+      println("clicked")
+     $("this").addClass("selected")
+    } ){
        card.id.mkString(", ")
-
     }
 
     def displayGame(cards: Set[Card])  = div(`class` := "board"){
