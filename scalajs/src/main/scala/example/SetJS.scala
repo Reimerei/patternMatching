@@ -45,6 +45,7 @@ object SetJS {
           val content = dom.document.getElementById("content")
           content.innerHTML = ""
           content.appendChild(WebElements.displayGame(cards).render)
+          updateScoreCard(scoreCard)
         case SetCompleted(newCards, scoreCard) =>
           updateBoard(newCards)
           updateScoreCard(scoreCard)
