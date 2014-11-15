@@ -25,13 +25,18 @@ object Game {
       size == 1 || size == s.size
     }
 
-  def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
+  def validateEqualityRule(set: Seq[Card]): Boolean = {
     val n: Int = set.headOption.map(_.id.size).getOrElse(0)
     val bits: Seq[Seq[Int]] = for {
       i <- 0 until n
     } yield set.map(_.id(i))
 
     bits.forall(validateBits)
+  }
+
+  def validate(set: Seq[Card], deck: Set[Card]): Boolean = {
+    validateEqualityRule(set)
+
   }
 
 
