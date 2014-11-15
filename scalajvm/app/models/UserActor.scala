@@ -24,9 +24,14 @@ class UserActor(out : ActorRef) extends Actor {
 
   var currentGame : Option[ActorRef] = None
 
+  def pickleAndSend(msg : Any, out : ActorRef) = {
+    val pickled : JsValue = PicklerRegistry.pickle(msg)
+    out ! pickled
+  }
+
   def receive = {
     //from websocket
-    case msg : JsValue => {
+    case msg : JsValue =>
       val unpickled = PicklerRegistry.unpickle(msg)
       //pass it on
       unpickled match {
@@ -48,12 +53,14 @@ class UserActor(out : ActorRef) extends Actor {
       self ! test
 
       Logger.debug(s"Received message: $msg")
-    }
+
     //from game logic
-    case msg : Any => {
-      val pickled : JsValue = PicklerRegistry.pickle(msg)
-      out ! pickled
-    }
+    case msg : GameStart =>
+      currentGame = Some(sender())
+      pickleAndSend(msg, out)
+
+    case msg : Any =>
+      pickleAndSend(msg, out)
   }
 
 }
