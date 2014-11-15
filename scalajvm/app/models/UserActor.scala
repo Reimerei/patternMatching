@@ -8,14 +8,7 @@ import org.scalajs.spickling._
 import shared._
 import org.scalajs.spickling.playjson._
 
-import scala.collection.immutable.HashMap.HashTrieMap
-import scala.collection.immutable.Map.{Map4, Map3, Map2, Map1}
-
 object UserActor {
-
-  //hacky initialisation
-  Pickles.register
-
   def props(out : ActorRef) = Props(new UserActor(out))
 }
 
