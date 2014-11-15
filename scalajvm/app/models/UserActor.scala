@@ -30,7 +30,7 @@ class UserActor(out : ActorRef) extends Actor {
       val unpickled = PicklerRegistry.unpickle(msg)
       //pass it on
       unpickled match {
-        case m@(JoinGame | CreateGame) => {
+        case m@(JoinGameWithId | JoinGameWithoutId | CreateGame) => {
           //send it to the game master
           GameMaster.gameMaster ! m
         }

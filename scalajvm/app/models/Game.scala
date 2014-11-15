@@ -54,7 +54,7 @@ class Game(gameId: Long) extends Actor {
   override def receive: Receive = pending
 
   def pending: Receive = {
-    case JoinGame(name, _) =>
+    case JoinGameWithId(name, _) =>
       players += sender() -> (name, 0)
       if (players.size == 2){
         val deck: Seq[Card] = Game.createDeck

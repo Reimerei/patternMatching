@@ -1,9 +1,10 @@
 package models
 
-import akka.actor.{Props, Actor, ActorRef}
-import play.api.libs.concurrent.Akka
-import shared.{GameStart, CreateGame}
+import akka.actor.{Actor, ActorRef, Props}
 import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import shared._
+
 import scala.util.Random
 
 
@@ -15,12 +16,17 @@ private class GameMaster extends Actor {
 
   override def receive: Receive = {
 
-    case msg: JoinGame =>
+    case msg: JoinGameWithoutId =>
       val game: ActorRef = findOrCreateGame()
       game forward msg
 
-    case JoinGame(playerName, Some(gameId)) =>
+    case msg@JoinGameWithId(playerName, gameId) =>
+      context.children.find(_.path.name == s"game-$gameId").map(game => game forward msg).getOrElse(sender ! GameNotFound)
+
     case CreateGame(player) =>
+      val gameId = nextId
+      context.actorOf(Game.props(gameId), name = s"game-$gameId")
+      sender ! GameCreated(gameId)
 
     case GameStart(_, _, _) =>
       pendingGames = pendingGames.filterNot(_ == sender)
@@ -29,12 +35,14 @@ private class GameMaster extends Actor {
 
   def findOrCreateGame(): ActorRef = {
     if (pendingGames.isEmpty) {
-      val gameId: Long = Random.nextLong()
+      val gameId = nextId
       val game: ActorRef = context.actorOf(Game.props(gameId), name = s"game-$gameId")
       pendingGames += game
     }
     pendingGames.head
   }
+
+  def nextId: Long = Random.nextLong()
 
 }
 
