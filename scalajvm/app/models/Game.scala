@@ -54,15 +54,17 @@ class Game(gameId: Long) extends Actor with ActorLogging {
   val BOARD_SIZE: Int = 12
   val SET_SIZE: Int = 3
 
-  var players: Map[ActorRef, (String, Int)] = Map()
+  var players: Map[ActorRef, PlayerState] = Map()
 
 
   override def receive: Receive = pending
 
   def pending: Receive = LoggingReceive {
     case msg@JoinGameWithoutId(name) =>
+
       //      log.debug(s"$msg from $sender")
-      players += sender() ->(name, 0)
+      players += sender() -> PlayerState(name, 0, true)
+
       if (players.keys.size >= 2) {
         val deck: Seq[Card] = Game.createDeck
         context.become(active(deck))
@@ -90,16 +92,29 @@ class Game(gameId: Long) extends Actor with ActorLogging {
       else {
         sender ! WrongGuess
       }
+
+    case UserQuit =>
+      players.find(_ == sender).map {
+        player =>
+          players = players.updated(sender, players(sender).copy(connected = false))
+          if (players.values.forall(!_.connected)) {
+            self ! PoisonPill
+          }
+          else {
+            publish(OtherUserQuit(Player(player._2.name)))
+          }
+      }
   }
 
   def updateScore(player: ActorRef): Unit =
-    players = players.updated(player, players(player).copy(_2 = players(player)._2 + 1))
+    players = players.updated(player, players(player).copy(score = players(player).score + 1))
 
-
-  def scoreCard: Map[Player, Int] = players.values.map(p => Player(p._1) -> p._2).toMap
+  def scoreCard: Map[Player, Int] = players.values.map(p => Player(p.name) -> p.score).toMap
 
   def publish(msg: Any): Unit = players.keys.foreach(_ ! msg)
 
   def activeCards(deck: Seq[Card]): Set[Card] = deck.take(BOARD_SIZE).toSet
+
+  case class PlayerState(name: String, score: Int, connected: Boolean)
 
 }
