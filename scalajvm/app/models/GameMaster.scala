@@ -1,6 +1,6 @@
 package models
 
-import akka.actor.{ActorLogging, Actor, ActorRef, Props}
+import akka.actor._
 import akka.event.LoggingReceive
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
@@ -18,7 +18,6 @@ private class GameMaster extends Actor with ActorLogging {
     case msg: JoinGameWithoutId =>
       log.debug(s"$msg")
       val game: ActorRef = findOrCreateGame()
-      log.debug(s"$game")
       game forward msg
 
     case msg@JoinGameWithId(playerName, gameId) =>
@@ -30,8 +29,12 @@ private class GameMaster extends Actor with ActorLogging {
       sender ! GameCreated(gameId)
 
     case msg: GameStart =>
-      log.debug(s"$msg")
+      log.debug(s"Game started")
       pendingGames = pendingGames.filterNot(_ == sender)
+
+    case Terminated(child) =>
+      log.debug("Game terminated")
+      pendingGames = pendingGames.filterNot(_ == child)
   }
 
 
