@@ -114,7 +114,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
             self ! PoisonPill
           }
           else {
-            publish(OtherUserQuit(Player(player._2.name)))
+            players.filter(_._2.connected).keys.foreach(_ ! OtherUserQuit(Player(player._2.name)))
           }
       }
   }
