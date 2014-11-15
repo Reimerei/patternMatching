@@ -59,7 +59,7 @@ object SetJS {
       val content = dom.document.getElementById("content")
       content.innerHTML = ""
       content.appendChild(WebElements.waitingForGame.render)
-      val cards = Set(Card(Seq(1,2,3,4)))
+      val cards = Set(Card(List(1,2,3,4)))
       content.appendChild(WebElements.displayGame(cards).render)
     }
   }
