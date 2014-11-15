@@ -43,7 +43,7 @@ class Game(gameId: Long) extends Actor {
       if (players.size == 2){
         val deck: Seq[Card] = createDeck
         context.become(active(deck))
-        val state: GameStart = GameStart(deck.take(BOARD_SIZE).toSet, scoreCard, gameId)
+        val state: GameStart = GameStart(activeCards(deck), scoreCard, gameId)
         context.parent ! state
         publish(state)
       }
@@ -51,11 +51,11 @@ class Game(gameId: Long) extends Actor {
 
   def active(deck: Seq[Card]): Receive = {
     case Guess(set) =>
-      if (Game.validate(set.toSeq, deck.take(BOARD_SIZE).toSet)) {
+      if (Game.validate(set.toSeq, activeCards(deck))) {
         updateScore(sender)
         context.become(active(deck.drop(3)))
         publish(SetCompleted(set, scoreCard))
-        if (!Game.hasMoreSets)
+        if (!Game.hasMoreSets(activeCards(deck)))
           publish(GameFinished(scoreCard))
       }
       else {
@@ -80,5 +80,7 @@ class Game(gameId: Long) extends Actor {
 
 
   def publish(msg: Any): Unit = players.keys.foreach(_ ! msg)
+
+  def activeCards(deck: Seq[Card]): Set[Card] = deck.take(BOARD_SIZE).toSet
 
 }
