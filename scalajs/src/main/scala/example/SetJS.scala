@@ -71,6 +71,7 @@ object SetJS {
             }
           }
           scoreCard = updatedScoreCard
+          selectedCards = Seq()
           render()
         case GameFinished(finalScoreCard) =>
           scoreCard = finalScoreCard
