@@ -1,6 +1,7 @@
 package models
 
 import akka.actor.{Props, ActorRef, Actor}
+import pickles.Pickles
 import play.api.Logger
 import play.api.libs.json.{JsValue}
 import org.scalajs.spickling._
@@ -8,17 +9,6 @@ import shared._
 import org.scalajs.spickling.playjson._
 
 object UserActor {
-  PicklerRegistry.register[GameStart]
-  PicklerRegistry.register[SetCompleted]
-  PicklerRegistry.register(WrongGuess)
-  PicklerRegistry.register[GameFinished]
-  PicklerRegistry.register[Guess]
-  PicklerRegistry.register[JoinGameWithoutId]
-  PicklerRegistry.register[JoinGameWithId]
-  PicklerRegistry.register[CreateGame]
-  PicklerRegistry.register[GameCreated]
-  PicklerRegistry.register(GameNotFound)
-
   def props(out : ActorRef) = Props(new UserActor(out))
 }
 
@@ -46,11 +36,8 @@ class UserActor(out : ActorRef) extends Actor {
             case None => Logger.info("Socket without a game received a game message")
           }
         }
+        case _ => Logger.warn(s"Unknown message $msg")
       }
-
-      //temporary
-      val test = WrongGuess
-      self ! test
 
       Logger.debug(s"Received message: $msg")
 
@@ -66,6 +53,10 @@ class UserActor(out : ActorRef) extends Actor {
       out ! pickled
 
       Logger.debug(s"Sent message: $msg")
+  }
 
+  override def postStop() : Unit = {
+    currentGame.foreach( _ ! UserQuit)
+    GameMaster.gameMaster ! UserQuit
   }
 }
