@@ -70,15 +70,9 @@ object SetJS {
           content.appendChild(div(id := scoreCardId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
-          //TODO: optimize to only map over cardsInPlay once
-          completedSet.zip(newCards).foreach {
-            case (oldCard, newCard) => {
-              cardsInPlay = cardsInPlay.map(c => if (c == oldCard) newCard else c)
-            }
-          }
-          scoreCard = updatedScoreCard
-          selectedCards = Seq()
-          render()
+          updateSets(completedSet, newCards, updatedScoreCard)
+        case NoCardsLeft(completedSet, updatedScoreCard) =>
+          updateSets(completedSet, Set.empty, updatedScoreCard)
         case GameFinished(finalScoreCard) =>
           scoreCard = finalScoreCard
           gameFinished()
@@ -86,6 +80,24 @@ object SetJS {
           wrongGuess()
         case x => println("unknown message: " + println(x))
       }
+    }
+
+    def updateSets(completedSet : Set[Card], newCards : Set[Card], updatedScoreCard : Map[Player, Int]) = {
+      //TODO: optimize to only map over cardsInPlay once
+      val paddedNewCards : List[Option[Card]] =
+        if(completedSet.size == newCards.size) newCards.map(Some(_)).toList
+        else {
+          val pad = completedSet.size - newCards.size
+          newCards.map(Some(_)).toList ::: List.fill(pad)(None)
+        }
+      completedSet.zip(paddedNewCards).foreach {
+        case (oldCard, newCard : Option[Card]) => {
+          cardsInPlay = cardsInPlay.flatMap(c => if (c == oldCard) newCard else Some(c))
+        }
+      }
+      scoreCard = updatedScoreCard
+      selectedCards = Seq()
+      render()
     }
 
     def onStart(e: dom.Event) = {

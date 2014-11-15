@@ -95,7 +95,7 @@ class Game(gameId: Long) extends Actor with ActorLogging {
     case Guess(set) =>
 
       log.debug(s"validate $set")
-      if (Game.validate(set.toSeq, activeCards(deck)) || true) {
+      if (Game.validate(set.toSeq, activeCards(deck))) {
 
         updateScore(sender)
 
