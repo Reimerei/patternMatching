@@ -31,10 +31,12 @@ class UserActor(out : ActorRef) extends Actor {
       val unpickled = PicklerRegistry.unpickle(msg)
       //pass it on
       unpickled match {
-        case m@(JoinGameWithId | JoinGameWithoutId | CreateGame) => {
-          //send it to the game master
+        case m : JoinGameWithId =>
           GameMaster.gameMaster ! m
-        }
+        case m : JoinGameWithoutId =>
+          GameMaster.gameMaster ! m
+        case m: CreateGame =>
+          GameMaster.gameMaster ! m
         case m: ClientSends => {
           //send it to the game
           currentGame match {
@@ -59,6 +61,8 @@ class UserActor(out : ActorRef) extends Actor {
       }
       val pickled: JsValue = PicklerRegistry.pickle(msg)
       out ! pickled
+
+      Logger.debug(s"Sent message: $msg")
 
   }
 }
