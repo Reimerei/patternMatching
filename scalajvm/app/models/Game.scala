@@ -89,16 +89,21 @@ class Game(gameId: Long) extends Actor with ActorLogging {
   }
 
   def active(deck: Seq[Card]): Receive = LoggingReceive {
+
     case Guess(set) =>
       if (Game.validate(set.toSeq, activeCards(deck))) {
         updateScore(sender)
-        context.become(active(deck.drop(3)))
-        val newCards : Set[Card] = Set.empty //TODO
+        val deckUpdated: Seq[Card] = deck.drop(SET_SIZE)
+        val newCards : Set[Card] = deckUpdated.take(SET_SIZE).toSet
+
         publish(SetCompleted(set, newCards, scoreCard))
+
         if (!Game.hasMoreSets(activeCards(deck))) {
           context.parent ! GameFinished(scoreCard)
           publish(GameFinished(scoreCard))
           self ! PoisonPill
+        } else {
+          context.become(active(deckUpdated))
         }
       }
       else {
