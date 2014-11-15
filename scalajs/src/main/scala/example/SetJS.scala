@@ -1,7 +1,7 @@
 package example
 
 import org.scalajs.dom
-import org.scalajs.jquery.{ jQuery => $ }
+import org.scalajs.jquery.{jQuery => $, JQueryStatic}
 import org.scalajs.spickling.PicklerRegistry
 import org.scalajs.spickling.jsany._
 import shared._
@@ -14,6 +14,10 @@ import scalatags.JsDom._
 import scalatags.JsDom.all._
 
 import Pickles._
+
+object StdGlobalScope extends js.GlobalScope {
+  def buildCardSvg(color: Int, shape: Int, pattern: Int, count: Int): scalatags.JsDom.Modifier = ???
+}
 
 @JSExport
 object SetJS {
@@ -126,13 +130,9 @@ object SetJS {
           // todo send to backend
 
           $(".select").removeClass("select")
-        }
+    }
 
-      }) {
-        card.id.mkString(", ")
-      }
-
-      def displayGame(cards: Set[Card]) = div(`class` := "board") {
+    def displayGame(cards: Set[Card])  = div(`class` := "board"){
         cards.toSeq.map(singleCard)
       }
     }
