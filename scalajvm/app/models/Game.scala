@@ -3,8 +3,9 @@ package models
 import akka.actor._
 import akka.event.LoggingReceive
 import shared._
-
+import scala.concurrent.duration._
 import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Game {
   def props(gameId: Long): Props = Props(new Game(gameId))
@@ -56,24 +57,21 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
   var players: Map[ActorRef, PlayerState] = Map()
 
+  val starter = context.system.scheduler.scheduleOnce(30.seconds, self, "start")
+  
+  override def postStop() = starter.cancel()
 
   override def receive: Receive = pending
 
   def pending: Receive = LoggingReceive {
+
+    case "start" => startGame
+
     case msg@JoinGameWithoutId(name) =>
-
-      //      log.debug(s"$msg from $sender")
       players += sender() -> PlayerState(name, 0, true)
-
-      if (players.keys.size >= 2) {
-
-        val deck: Seq[Card] = Game.createDeck
-        val state: GameStart = GameStart(deck.take(BOARD_SIZE).toSet, scoreCard, gameId)
-
-        context.parent ! state
-        publish(state)
-
-        context.become(active(deck))
+      if (players.size >= 5){
+        starter.cancel()
+        startGame
       }
 
     case UserQuit =>
@@ -88,6 +86,16 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
     case msg =>
       log.debug(s"Unhandled message: $msg")
+  }
+
+  def startGame {
+    val deck: Seq[Card] = Game.createDeck
+    val state: GameStart = GameStart(deck.take(BOARD_SIZE).toSet, scoreCard, gameId)
+
+    context.parent ! state
+    publish(state)
+
+    context.become(active(deck))
   }
 
   def active(deck: Seq[Card]): Receive = LoggingReceive {
