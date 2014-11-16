@@ -54,12 +54,18 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
   val BOARD_SIZE: Int = 16
   val SET_SIZE: Int = 3
+  val SECONDS: Int = 120
+  val MAX_PLAYERS: Int = 5
 
   var players: Map[ActorRef, PlayerState] = Map()
 
   val starter = context.system.scheduler.scheduleOnce(30.seconds, self, "start")
-  
-  override def postStop() = starter.cancel()
+  val tick = context.system.scheduler.schedule(1.seconds, 1.second, self, "tick")
+
+  override def postStop() = {
+    starter.cancel()
+    tick.cancel()
+  }
 
   override def receive: Receive = pending
 
@@ -67,9 +73,12 @@ class Game(gameId: Long) extends Actor with ActorLogging {
 
     case "start" => startGame
 
+    case "tick" =>
+      publish(GameStatus(s"${players.size} players waiting to play"))
+
     case msg@JoinGameWithoutId(name) =>
       players += sender() -> PlayerState(name, 0, true)
-      if (players.size >= 5){
+      if (players.size >= MAX_PLAYERS){
         starter.cancel()
         startGame
       }
@@ -95,10 +104,19 @@ class Game(gameId: Long) extends Actor with ActorLogging {
     context.parent ! state
     publish(state)
 
-    context.become(active(deck))
+    context.become(active(deck, SECONDS))
   }
 
-  def active(deck: Seq[Card]): Receive = LoggingReceive {
+  def active(deck: Seq[Card], timeLeft: Int): Receive = LoggingReceive {
+
+    case "tick" =>
+      if (timeLeft <= 0) {
+        gameFinished
+      }
+      else {
+        publish(GameStatus(s"Game will finish in: $timeLeft seconds"))
+        context.become(active(deck, timeLeft - 1))
+      }
 
     case Guess(set) =>
 
@@ -119,11 +137,9 @@ class Game(gameId: Long) extends Actor with ActorLogging {
         }
 
         if (!Game.hasMoreSets(activeCards(deckUpdated))) {
-          context.parent ! GameFinished(scoreCard)
-          publish(GameFinished(scoreCard))
-          self ! PoisonPill
+          gameFinished
         } else {
-          context.become(active(deckUpdated))
+          context.become(active(deckUpdated, timeLeft))
         }
       }
       else {
@@ -142,6 +158,12 @@ class Game(gameId: Long) extends Actor with ActorLogging {
             players.filter(_._2.connected).keys.foreach(_ ! OtherUserQuit(Player(player._2.name)))
           }
       }
+  }
+
+  def gameFinished {
+    context.parent ! GameFinished(scoreCard)
+    publish(GameFinished(scoreCard))
+    self ! PoisonPill
   }
 
   def updateScore(player: ActorRef): Unit =

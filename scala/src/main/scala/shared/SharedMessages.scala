@@ -17,6 +17,7 @@ case class GameCreated(gameId: Long) extends ServerSend
 case object GameNotFound extends ServerSend
 case class OtherUserQuit(player : Player) extends ServerSend
 case class NoCardsLeft(completedSet: Set[Card], scoreCard: Map[Player, Int]) extends ServerSend
+case class GameStatus(msg: String) extends ServerSend
 
 // Client sends
 trait ClientSends

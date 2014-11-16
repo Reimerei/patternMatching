@@ -90,6 +90,7 @@ object Pickles {
     PicklerRegistry.register[Map4[Any, Any]]
     PicklerRegistry.register[HashTrieMap[Any, Any]]
 
+    PicklerRegistry.register[GameStatus]
     PicklerRegistry.register[NoCardsLeft]
     PicklerRegistry.register[GameStart]
     PicklerRegistry.register[SetCompleted]

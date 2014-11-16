@@ -37,12 +37,14 @@ object SetJS {
   class SetClient(url: String) {
 
     val scoreCardId = "score-card"
+    val gameStatusId = "game-status"
     val boardId = "game-board"
     val gameFinishedMessageId = "game-finished-message"
 
     private var playerName = ""
     private var cardsInPlay : List[Card] = Nil
     private var scoreCard = Map[Player, Int]()
+    private var gameStatus = ""
 
     var selectedCards: Seq[Int] = Seq()
 
@@ -68,6 +70,7 @@ object SetJS {
           content.appendChild(div(id := gameFinishedMessageId).render)
           content.appendChild(div(id := boardId){}.render)
           content.appendChild(div(id := scoreCardId) {}.render)
+          content.appendChild(div(id := gameStatusId) {}.render)
           render()
         case SetCompleted(completedSet, newCards, updatedScoreCard) =>
           updateSets(completedSet, newCards, updatedScoreCard)
@@ -75,9 +78,14 @@ object SetJS {
           updateSets(completedSet, Set.empty, updatedScoreCard)
         case GameFinished(finalScoreCard) =>
           scoreCard = finalScoreCard
+          gameStatus = ""
           gameFinished()
         case WrongGuess =>
           wrongGuess()
+        case GameStatus(msg) =>
+          gameStatus = msg
+          updateGameStatus()
+          
         case x => println("unknown message: " + println(x))
       }
     }
@@ -133,6 +141,7 @@ object SetJS {
       board.innerHTML = ""
       board.appendChild(WebElements.displayGame(cardsInPlay).render)
       updateScoreCard()
+      updateGameStatus()
       cardsInPlay.zipWithIndex.foreach{
         case (card, j) =>
           StdGlobalScope.buildCardSvg("c_" + j, card.id(0), card.id(1), card.id(2), card.id(3), selectedCards.contains(j))
@@ -155,6 +164,11 @@ object SetJS {
     def updateScoreCard() = {
       val scorecard = dom.document.getElementById(scoreCardId)
       scorecard.innerHTML = WebElements.scorecard(scoreCard).render.outerHTML
+    }
+
+    def updateGameStatus() = {
+      val status = dom.document.getElementById(gameStatusId)
+      status.innerHTML = WebElements.statusMsg(gameStatus).render.outerHTML
     }
 
     object WebElements {
@@ -202,6 +216,10 @@ object SetJS {
             tr(td(player.name), td(score))
         }
         table(tbody(List(headers) ++ data))
+      }
+
+      def statusMsg(msg: String) = {
+        p(msg)
       }
 
     }
