@@ -90,7 +90,7 @@ function buildCardSvg(cssClass, color, shape, pattern, count, selected){
 
   var s = Snap(W, W);
   var selecteds = {
-    true: {fill: s.gradient("r(0.5, 0.5, 1.0)#fff-#888"), stroke: 'black', strokeWidth: 2},
+    true: {fill: s.gradient("r(0.5, 0.5, 1.0)#fff-#aaa"), stroke: '#aaa', strokeWidth: 2},
     false: {fill: '#eee'}
   };
   s.rect(padding,padding,W-(2*padding),W-(2*padding), padding, padding).attr(selecteds[selected]);

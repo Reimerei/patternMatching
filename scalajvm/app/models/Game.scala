@@ -56,10 +56,11 @@ class Game(gameId: Long) extends Actor with ActorLogging {
   val SET_SIZE: Int = 3
   val SECONDS: Int = 120
   val MAX_PLAYERS: Int = 5
+  val WAITING_TIME: Int = 15
 
   var players: Map[ActorRef, PlayerState] = Map()
 
-  val starter = context.system.scheduler.scheduleOnce(30.seconds, self, "start")
+  val starter = context.system.scheduler.scheduleOnce(WAITING_TIME.seconds, self, "start")
   val tick = context.system.scheduler.schedule(1.seconds, 1.second, self, "tick")
 
   override def postStop() = {
