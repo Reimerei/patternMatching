@@ -46,6 +46,7 @@ object ApplicationBuild extends Build with UniversalKeys {
       stage <<= stage dependsOn (fullOptJS in (scalajs, Compile)),
       libraryDependencies ++= Dependencies.scalajvm.value,
       resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))( Resolver.ivyStylePatterns),  
+      resolvers += "Jcenter" at "http://jcenter.bintray.com/",
       EclipseKeys.skipParents in ThisBuild := false,
       commands += preStartCommand
     ) ++ (
